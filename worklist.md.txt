@@ -1,0 +1,71 @@
+Installer Orthanc sur le serveur Windows
+Dossier: D:\Orthanc Server
+Service Orthanc en Automatic
+Corriger la config Orthanc (point critique)
+Garder une seule section Worklists.
+Si Worklists est dans orthanc.json, alors worklists.json doit être renommé en .bak (ou inversement).
+Valeur attendue:
+"Worklists": { "Enable": true, "Database": "D:/Orthanc Server/Worklists" }
+Corriger crash plugin WebViewer (si présent)
+Si Orthanc ne démarre pas avec erreur SQLite sur OrthancWebViewer.dll:
+renommer D:\Orthanc Server\Plugins\OrthancWebViewer.dll en OrthancWebViewer.dll.disabled
+Cela n’impacte pas MWL.
+Dossier Worklist
+Créer: D:\Orthanc Server\Worklists
+Vérifier droits lecture/écriture pour le service Orthanc.
+Déclarer modalités DICOM (obligatoire si DicomAlwaysAllowFindWorklist=false)
+Renseigner DicomModalities avec AET/IP/Port des machines scanner/écho.
+Installer DCMTK
+Installer D:\dcmtk 3.7
+Vérifier binaire:
+D:\dcmtk 3.7\bin\dump2dcm.exe
+Configurer MediOffice .env
+ORTHANC_BASE_URL=http://127.0.0.1:8042
+ORTHANC_USERNAME=orthanc
+ORTHANC_PASSWORD=orthanc
+ORTHANC_WORKLIST_PATH=/worklists
+ORTHANC_WORKLIST_DIRECTORY="D:/Orthanc Server/Worklists"
+ORTHANC_DUMP2DCM_PATH="D:/dcmtk 3.7/bin/dump2dcm.exe"
+DICOM_UID_ROOT=1.2.826.0.1.3680043.10.5432
+ORTHANC_WEBHOOK_TOKEN=<secret>
+Appliquer config Laravel
+php artisan config:clear
+Démarrer et valider Orthanc
+Start-Service Orthanc
+Test API:
+http://127.0.0.1:8042/system -> doit répondre 200
+Test fonctionnel bout en bout
+Dans MediOffice: + Demande Imagerie
+Vérifier fichier généré dans D:\Orthanc Server\Worklists:
+.wl (natif DICOM) + éventuellement .wl.json
+Depuis modalité: lancer MWL C-FIND vers Orthanc
+Vérifier récupération patient/examen (AccessionNumber, PatientID, etc.)
+Webhook statut (option prod recommandé)
+Orthanc -> POST /care/module-3/orthanc/webhook
+Header: X-Orthanc-Token
+Events: study-started, study-received, study-completed
+
+
+
+
+
+
+Sur la modalité: bouton Worklist/Query
+Sur la machine d’imagerie (scanner/écho), il y a un écran “liste patients à faire”.
+Le bouton s’appelle souvent Worklist, MWL, Query, Refresh.
+Quand le manipulateur clique dessus, la machine demande à Orthanc: “donne-moi les examens planifiés”.
+Si tout est OK, elle affiche la demande créée depuis MediOffice (avec AccessionNumber).
+DicomModalities (si DicomAlwaysAllowFindWorklist=false)
+DicomAlwaysAllowFindWorklist=false = Orthanc n’accepte pas n’importe quelle machine.
+Donc il faut autoriser explicitement chaque modalité dans DicomModalities.
+Exemple dans orthanc.json:
+"DicomAlwaysAllowFindWorklist": false,
+"DicomModalities": {
+  "SCANNER_CT": [ "SCANNER_CT", "192.168.1.50", 104 ],
+  "ECHO_US":    [ "ECHO_US",    "192.168.1.51", 104 ]
+}
+Format:
+
+1er champ: AET de la modalité
+2e champ: IP de la modalité
+3e champ: port DICOM de la modalité

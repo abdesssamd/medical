@@ -1,0 +1,11 @@
+{
+  "name": "MediOffice Care Suite",
+  "short_name": "MediOffice",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "fr",
+  "description": "Gestion clinique modulaire avec mode offline et synchronisation automatique."
+}
+

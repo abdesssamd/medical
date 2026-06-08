@@ -1,0 +1,52 @@
+<?php
+// Temporary debug route
+Route::get('/debug/view-html', function () {
+    // Render clinical-workflow view with minimal mock data
+    $view = view('modules.clinical-workflow', [
+        'patientDirectory' => [],
+        'patients' => collect(),
+        'selectedPatientId' => 0,
+        'selectedPatient' => null,
+        'currentTab' => 'overview',
+        'bmi' => null,
+        'nextAppointment' => null,
+        'allergies' => collect(),
+        'patientAllergies' => collect(),
+        'patientMedicalHistory' => collect(),
+        'patientCriticalConditions' => collect(),
+        'riskTags' => collect(),
+        'criticalBannerItems' => collect(),
+        'odontogram' => null,
+        'odontogramTeethStatus' => [],
+        'teethSummary' => [],
+        'timeline' => collect(),
+        'timelineFilters' => ['timeline_from' => null, 'timeline_to' => null, 'timeline_type' => 'all'],
+        'manifest' => null,
+        'consultationTypes' => [],
+        'diagnosisCatalog' => [],
+        'consultationMotifs' => [],
+        'questionnaires' => collect(),
+        'questionnaireResponses' => collect(),
+        'questionnaireTemplatesPayload' => collect(),
+        'periodontalCharts' => collect(),
+        'periodontalSeed' => [],
+        'periodontalHistorySeed' => [],
+        'statusColors' => ['completed' => '#10b981', 'in_progress' => '#3b82f6', 'planned' => '#f59e0b', 'cancelled' => '#ef4444'],
+        'prescriptions' => collect(),
+        'prescriptionTemplates' => collect(),
+        'consultations' => collect(),
+        'appointmentsForPatient' => collect(),
+        'practitioners' => collect(),
+        'radiologyRequests' => collect(),
+        'treatmentPlans' => collect(),
+        'treatmentQuotes' => collect(),
+        'estimatedBalance' => 0,
+        'patientAlerts' => collect(),
+        'medications' => collect(),
+        'healthQuestionnaires' => collect(),
+        'currentSpecialtyCode' => 'DENTAL',
+        'isCloud' => false,
+    ]);
+
+    return response($view)->header('Content-Type', 'text/plain');
+})->middleware('web');

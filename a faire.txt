@@ -1,0 +1,12 @@
+Prise de rendez-vous (date/heure) + file prioritaire rendez-vous.
+QR code sur ticket pour suivre statut en mobile local.
+Affichage ETA réel par ticket (pas seulement moyenne par service).
+Règles de priorité (PMR, senior, urgence) paramétrables.
+Escalade automatique: ticket non appelé X min => alerte superviseur.
+Tableau superviseur en temps réel (tous guichets, SLA, goulots).
+Multimédia TV avancé: playlist images/vidéos/messages programmée par horaire.
+Audit complet (qui a appelé/servi/transféré, quand, depuis quel poste).
+Import/export agents/services/bureaux via Excel.
+Mode “panne réseau” local cache + resynchronisation automatique.
+Notifications sonores différentes par service/priorité.
+Rapport PDF officiel (journalier/mensuel) avec signature/cachet établissement.

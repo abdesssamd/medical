@@ -1,0 +1,9 @@
+{
+  "name": "Appointment",
+  "alias": "appointment",
+  "description": "Appointment scheduling and commission module",
+  "providers": [
+    "Modules\\Appointment\\Providers\\AppointmentServiceProvider",
+    "Modules\\Appointment\\Providers\\EventServiceProvider"
+  ]
+}
