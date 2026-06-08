@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'specialty' => \App\Http\Middleware\EnsureSpecialty::class,
+            'patient.portal' => \Modules\PatientPortal\Middleware\EnsurePatientPortalAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

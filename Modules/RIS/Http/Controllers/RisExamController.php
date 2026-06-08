@@ -33,12 +33,15 @@ class RisExamController extends Controller
             ? Patient::query()->find($selectedPatientId)
             : null;
 
+        $includeOrphan = $request->boolean('include_orphan');
+
         $filters = [
             'search' => trim((string) $request->string('search')),
             'status' => trim((string) $request->string('status')),
             'modality_id' => $request->integer('modality_id') ?: null,
             'priority' => trim((string) $request->string('priority')),
             'patient_id' => $selectedPatient?->id,
+            'include_orphan' => $includeOrphan,
         ];
 
         $orders = RisOrder::query()
@@ -68,6 +71,65 @@ class RisExamController extends Controller
             ->latest('id')
             ->paginate(12)
             ->withQueryString();
+
+        $orphanStudies = collect();
+        if ($includeOrphan) {
+            $orthancStudies = $orthancService->listAllStudies(100);
+            if (($orthancStudies['ok'] ?? false) && ! empty($orthancStudies['studies'])) {
+                $existingAccessions = RisOrder::query()
+                    ->whereNotNull('accession_number')
+                    ->where('accession_number', '!=', '')
+                    ->pluck('accession_number')
+                    ->map(fn ($v) => trim((string) $v))
+                    ->filter()
+                    ->values()
+                    ->toArray();
+
+                $existingStudyUids = RisOrder::query()
+                    ->whereNotNull('orthanc_payload')
+                    ->get()
+                    ->map(fn (RisOrder $o) => data_get((array) $o->orthanc_payload, 'study_uid', ''))
+                    ->filter()
+                    ->values()
+                    ->toArray();
+
+                foreach ($orthancStudies['studies'] as $study) {
+                    $acc = trim((string) ($study['accession_number'] ?? ''));
+                    $uid = trim((string) ($study['study_instance_uid'] ?? ''));
+                    $patId = trim((string) ($study['patient_id'] ?? ''));
+
+                    if ($acc !== '' && in_array($acc, $existingAccessions, true)) {
+                        continue;
+                    }
+                    if ($uid !== '' && in_array($uid, $existingStudyUids, true)) {
+                        continue;
+                    }
+
+                    $orphanStudies->push((object) [
+                        'source' => 'orthanc',
+                        'orthanc_study_id' => $study['study_id'],
+                        'study_uid' => $study['study_instance_uid'],
+                        'patient_id' => $study['patient_id'],
+                        'patient_name' => $study['patient_name'],
+                        'accession_number' => $study['accession_number'],
+                        'study_date' => $study['study_date'],
+                        'study_description' => $study['study_description'],
+                        'modality' => $study['modality'],
+                    ]);
+                }
+            }
+
+            if ($filters['search'] !== '') {
+                $search = mb_strtolower($filters['search']);
+                $orphanStudies = $orphanStudies->filter(fn ($s) =>
+                    mb_strpos(mb_strtolower((string) $s->patient_name), $search) !== false
+                    || mb_strpos(mb_strtolower((string) $s->patient_id), $search) !== false
+                    || mb_strpos(mb_strtolower((string) $s->accession_number), $search) !== false
+                    || mb_strpos(mb_strtolower((string) $s->study_description), $search) !== false
+                    || mb_strpos(mb_strtolower((string) $s->modality), $search) !== false
+                )->values();
+            }
+        }
 
         $statsForPatient = fn ($query) => $selectedPatient
             ? $query->where('patient_id', $selectedPatient->id)
@@ -124,6 +186,7 @@ class RisExamController extends Controller
             'requesters' => $requesters,
             'statusLabels' => RisOrder::statusLabels(),
             'priorityLabels' => RisOrder::priorityLabels(),
+            'orphanStudies' => $orphanStudies,
         ]);
     }
 

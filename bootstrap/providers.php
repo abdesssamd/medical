@@ -11,6 +11,8 @@ return [
     Modules\Billing\Providers\BillingServiceProvider::class,
     Modules\RIS\Providers\RisServiceProvider::class,
     Modules\RIS\Providers\EventServiceProvider::class,
+    Modules\PatientPortal\Providers\PatientPortalServiceProvider::class,
+    Modules\PatientPortal\Providers\EventServiceProvider::class,
     Modules\Gynecology\Providers\GynecologyServiceProvider::class,
     Modules\Pediatrics\Providers\PediatricsServiceProvider::class,
     Modules\Burns\Providers\BurnsServiceProvider::class,

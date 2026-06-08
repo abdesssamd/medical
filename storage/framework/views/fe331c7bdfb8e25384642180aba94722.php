@@ -759,6 +759,12 @@
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
+                    <div class="ris26-field" style="display: flex; align-items: flex-end; padding-bottom: 4px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; text-transform: none; letter-spacing: normal; color: var(--ris-ink); font-weight: 700;">
+                            <input type="checkbox" name="include_orphan" value="1" <?php if($filters['include_orphan']): echo 'checked'; endif; ?> style="width: 18px; height: 18px; border-radius: 6px; accent-color: var(--ris-accent);">
+                            <span>Inclure les instances <span style="color: var(--ris-accent-deep);">PACS</span> non liees au RIS</span>
+                        </label>
+                    </div>
                     <div class="ris26-actions" style="align-self: end;">
                         <button type="submit" class="ris26-btn ris26-btn-primary">Filtrer</button>
                         <a href="<?php echo e(route('ris.exams.index')); ?>" class="ris26-btn">Reset</a>
@@ -850,6 +856,63 @@
                                     <tr>
                                         <td colspan="6" class="ris26-empty">Aucun examen RIS ne correspond aux filtres.</td>
                                     </tr>
+                                <?php endif; ?>
+
+                                <?php if($orphanStudies->isNotEmpty()): ?>
+                                    <tr>
+                                        <td colspan="6" style="padding: 20px 14px 6px;">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                                                <span style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; font-weight: 800;">
+                                                    Études PACS orphelines (non liées au RIS) — <?php echo e($orphanStudies->count()); ?> trouvée(s)
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                        $orthancViewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/');
+                                    ?>
+                                    <?php $__currentLoopData = $orphanStudies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $study): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
+                                            $studyViewerUrl = $study->study_uid
+                                                ? $orthancViewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode($study->study_uid)
+                                                : null;
+                                            $studyDate = $study->study_date && strlen($study->study_date) >= 8
+                                                ? substr($study->study_date, 0, 4).'/'.substr($study->study_date, 4, 2).'/'.substr($study->study_date, 6, 2)
+                                                : ($study->study_date ?: 'Date inconnue');
+                                        ?>
+                                        <tr class="ris26-row" style="background: rgba(255, 247, 237, 0.6);">
+                                            <td>
+                                                <div class="ris26-entity-title"><?php echo e($study->accession_number ?: 'PACS-'.$study->orthanc_study_id); ?></div>
+                                                <div class="ris26-entity-meta">Étude du <?php echo e($studyDate); ?></div>
+                                            </td>
+                                            <td>
+                                                <div class="ris26-entity-title"><?php echo e($study->patient_name ?: 'Patient inconnu'); ?></div>
+                                                <div class="ris26-entity-meta"><?php echo e($study->patient_id); ?></div>
+                                            </td>
+                                            <td>
+                                                <div class="ris26-entity-title"><?php echo e($study->study_description ?: 'Description non renseignee'); ?></div>
+                                                <div class="ris26-entity-meta"><?php echo e($study->modality ?: 'Modalite inconnue'); ?></div>
+                                            </td>
+                                            <td>
+                                                <div class="ris26-entity-title" style="color: #92400e;">Non lie au RIS</div>
+                                                <div class="ris26-entity-meta">Orphelin PACS</div>
+                                            </td>
+                                            <td>
+                                                <span class="ris26-chip" style="background: #fef3c7; color: #92400e; border-color: #fde68a;">
+                                                    <i class="ti ti-cloud-off" style="font-size: 1rem;"></i>
+                                                    Hors RIS
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="ris26-row-actions">
+                                                    <?php if($studyViewerUrl): ?>
+                                                        <a href="<?php echo e($studyViewerUrl); ?>" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 <?php endif; ?>
                             </tbody>
                         </table>

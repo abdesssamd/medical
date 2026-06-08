@@ -226,6 +226,76 @@ class OrthancService
     }
 
     /**
+     * Liste toutes les etudes Orthanc (quel que soit le patient).
+     * Utilise /tools/find avec Expand pour eviter un appel par etude.
+     */
+    public function listAllStudies(int $limit = 100): array
+    {
+        try {
+            $response = $this->client()->post('/tools/find', [
+                'Level' => 'Study',
+                'Expand' => true,
+                'Limit' => $limit,
+                'Query' => (object) [],
+            ]);
+
+            if (! $response->successful()) {
+                return [
+                    'ok' => false,
+                    'status' => $response->status(),
+                    'message' => $response->body(),
+                    'studies' => [],
+                ];
+            }
+
+            $studies = [];
+            foreach (collect($response->json())->filter()->values() as $studyEntry) {
+                $study = (array) $studyEntry;
+                $studyId = (string) ($study['ID'] ?? '');
+                if ($studyId === '') {
+                    continue;
+                }
+
+                $mainTags = (array) ($study['MainDicomTags'] ?? []);
+                $patientTags = (array) ($study['PatientMainDicomTags'] ?? []);
+                $patientName = (string) ($patientTags['PatientName'] ?? $mainTags['PatientName'] ?? '');
+
+                $studies[] = [
+                    'orthanc_patient_id' => (string) ($study['ParentPatient'] ?? ''),
+                    'study_id' => $studyId,
+                    'patient_id' => (string) ($patientTags['PatientID'] ?? $mainTags['PatientID'] ?? ''),
+                    'patient_name' => str_replace('^', ' ', $patientName),
+                    'study_date' => (string) ($mainTags['StudyDate'] ?? ''),
+                    'study_description' => (string) ($mainTags['StudyDescription'] ?? ''),
+                    'accession_number' => (string) ($mainTags['AccessionNumber'] ?? ''),
+                    'study_instance_uid' => (string) ($mainTags['StudyInstanceUID'] ?? ''),
+                    'modality' => (string) ($mainTags['ModalitiesInStudy'] ?? $mainTags['Modality'] ?? ''),
+                    'last_update' => (string) ($study['LastUpdate'] ?? ''),
+                    'patient_main_dicom_tags' => $patientTags,
+                    'main_dicom_tags' => $mainTags,
+                    'raw' => $study,
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'status' => 200,
+                'count' => count($studies),
+                'studies' => $studies,
+            ];
+        } catch (\Throwable $exception) {
+            Log::warning('ris.orthanc.list_all_studies_failed', ['error' => $exception->getMessage()]);
+
+            return [
+                'ok' => false,
+                'status' => null,
+                'message' => $exception->getMessage(),
+                'studies' => [],
+            ];
+        }
+    }
+
+    /**
      * Tente de faire correspondre une demande RIS avec les etudes Orthanc du patient.
      */
     public function reconcileOrderFromOrthanc(RisOrder $order, ?array $studies = null): array

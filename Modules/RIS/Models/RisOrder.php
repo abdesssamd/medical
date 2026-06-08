@@ -73,6 +73,11 @@ class RisOrder extends Model
         return $this->hasOne(RisReport::class, 'order_id');
     }
 
+    public function portalAccess(): HasOne
+    {
+        return $this->hasOne(\Modules\PatientPortal\Models\PatientPortalAccess::class, 'order_id');
+    }
+
     public function requestedBy(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'requested_by_user_id');

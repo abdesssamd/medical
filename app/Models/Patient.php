@@ -227,6 +227,11 @@ class Patient extends Model
         return $this->hasMany(\Modules\ClinicalRecord\Models\TreatmentPlan::class);
     }
 
+    public function portalAccesses(): HasMany
+    {
+        return $this->hasMany(\Modules\PatientPortal\Models\PatientPortalAccess::class);
+    }
+
     /**
      * Get all invoices for this patient.
      */
