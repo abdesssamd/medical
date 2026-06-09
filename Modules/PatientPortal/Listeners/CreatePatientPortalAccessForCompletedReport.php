@@ -9,9 +9,13 @@ use Modules\RIS\Events\RisOrderCompleted;
 
 class CreatePatientPortalAccessForCompletedReport
 {
-    public function handle(RisOrderCompleted $event, PatientPortalAccessService $service): void
+    public function __construct(
+        private readonly PatientPortalAccessService $service,
+    ) {}
+
+    public function handle(RisOrderCompleted $event): void
     {
-        $result = $service->issueForOrder($event->order);
+        $result = $this->service->issueForOrder($event->order);
         $access = $result['access'] ?? null;
         $plainCode = $result['code'] ?? null;
 

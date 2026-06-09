@@ -117,6 +117,13 @@
                     @method('PATCH')
                     <button class="risx-btn risx-btn-wide risx-btn-info" type="submit">Marquer images recues</button>
                 </form>
+                @if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE)
+                    <form method="POST" action="{{ route('ris.exams.complete', $order) }}">
+                        @csrf
+                        @method('PATCH')
+                        <button class="risx-btn risx-btn-wide risx-btn-success" type="submit">Terminer & cloturer</button>
+                    </form>
+                @endif
                 <form method="POST" action="{{ route('ris.exams.worklist', $order) }}">
                     @csrf
                     <button class="risx-btn risx-btn-wide" type="submit">Synchroniser</button>
@@ -302,6 +309,7 @@
     .risx-btn-warning { border-color: #fdba74; background: #fff7ed; color: #9a3412; }
     .risx-btn-info { border-color: #93c5fd; background: #dbeafe; color: #1d4ed8; }
     .risx-btn-danger { border-color: #fecaca; background: #fee2e2; color: #991b1b; margin-top: 8px; }
+    .risx-btn-success { border-color: #86efac; background: #dcfce7; color: #166534; }
     .risx-btn-ai { border-color: #7c3aed; background: #7c3aed; color: #fff; }
     .risx-btn-ai:hover { background: #6d28d9; border-color: #6d28d9; color: #fff; }
     .risx-btn:disabled { opacity: 0.55; cursor: not-allowed; }

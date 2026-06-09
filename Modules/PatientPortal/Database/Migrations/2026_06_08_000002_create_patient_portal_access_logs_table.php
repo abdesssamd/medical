@@ -14,10 +14,10 @@ return new class extends Migration
             $table->string('event_type', 50)->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
-            $table->json('context')->nullable();
+            $table->longText('context')->nullable();
             $table->timestamps();
 
-            $table->index(['patient_portal_access_id', 'event_type']);
+            $table->index(['patient_portal_access_id', 'event_type'], 'ppal_access_id_event_idx');
         });
     }
 
