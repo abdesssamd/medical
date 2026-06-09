@@ -136,6 +136,40 @@
                     <button class="risx-btn risx-btn-danger" type="submit">Annuler</button>
                 </form>
             </section>
+            @if($portalAccess)
+            <section class="risx-card risx-side-card" style="border-color: #86efac;">
+                <h4 style="display:flex;align-items:center;gap:8px;">
+                    <i class="ti ti-door-enter" style="color:#166534;"></i>
+                    Portail patient
+                </h4>
+                <div style="font-size:0.84rem;display:grid;gap:6px;">
+                    <div><strong>Statut:</strong>
+                        @if($portalAccess->revoked_at)
+                            <span style="color:#991b1b;">Révoqué</span>
+                        @elseif($portalAccess->verified_at)
+                            <span style="color:#166534;">Utilisé ({{ $portalAccess->verified_at->format('d/m/Y H:i') }})</span>
+                        @elseif($portalAccess->isExpired())
+                            <span style="color:#92400e;">Expiré</span>
+                        @else
+                            <span style="color:#166534;">Actif</span>
+                        @endif
+                    </div>
+                    <div><strong>Code:</strong> <code style="font-size:1.1rem;letter-spacing:2px;background:#f1f5f9;padding:2px 8px;border-radius:6px;">{{ $portalAccess->access_code_last4 ? str_repeat('•', 4).$portalAccess->access_code_last4 : '—' }}</code></div>
+                    <div><strong>Expire le:</strong> {{ optional($portalAccess->expires_at)->format('d/m/Y') ?: '—' }}</div>
+                    <div><strong>Email:</strong> {{ $portalAccess->delivery_email ?: '—' }}</div>
+                    <div><strong>Tel:</strong> {{ $portalAccess->delivery_phone ?: '—' }}</div>
+                    @if($portalAccess->delivery_email)
+                        <div style="color:#64748b;font-size:0.78rem;">Un email a été envoyé avec le code d'accès.</div>
+                    @else
+                        <div style="color:#92400e;font-size:0.78rem;">Aucun email — imprimez le mémo pour remettre le code au patient.</div>
+                    @endif
+                    <div style="display:flex;gap:8px;margin-top:6px;">
+                        <a href="{{ route('patient-portal.admin.show', $portalAccess) }}" class="risx-btn risx-btn-wide" target="_blank">Voir l'accès</a>
+                        <a href="{{ route('patient-portal.admin.memo', $portalAccess) }}" class="risx-btn risx-btn-wide" target="_blank">Imprimer mémo</a>
+                    </div>
+                </div>
+            </section>
+            @endif
         </aside>
 
         <main class="risx-main">
@@ -669,35 +703,57 @@
 
         voiceButton?.addEventListener('click', () => {
             if (!canEdit) return;
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SpeechRecognition) {
-                    alert('Reconnaissance vocale non disponible sur ce navigateur.');
-                    return;
-                }
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'fr-FR';
-                recognition.interimResults = true;
-                recognition.continuous = false;
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Reconnaissance vocale non disponible. Utilisez Chrome ou Edge.');
+                return;
+            }
+            if (voiceButton.dataset.listening === '1') {
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.interimResults = true;
+            recognition.continuous = false;
+            voiceButton.dataset.listening = '1';
 
-                let lastTranscript = '';
-                recognition.onstart = () => { voiceButton.textContent = '⏺ Écoute...'; };
-                recognition.onend = () => { voiceButton.textContent = 'Dictee'; };
-                recognition.onresult = (event) => {
-                    const results = Array.from(event.results);
-                    const finalTranscript = results
-                        .filter(r => r.isFinal)
-                        .map(r => r[0]?.transcript || '')
-                        .join('').trim();
-                    if (finalTranscript && finalTranscript !== lastTranscript) {
-                        insertContent(`<span>${finalTranscript} </span>`);
-                        lastTranscript = finalTranscript;
-                    }
-                };
-                recognition.onerror = () => {
-                    voiceButton.textContent = 'Dictee';
-                    alert('La dictee vocale a rencontre une erreur.');
-                };
+            let lastTranscript = '';
+            recognition.onstart = () => { voiceButton.innerHTML = '<i class="ti ti-microphone"></i> Écoute...'; };
+            recognition.onend = () => {
+                voiceButton.innerHTML = '<i class="ti ti-microphone"></i>';
+                voiceButton.dataset.listening = '0';
+            };
+            recognition.onresult = (event) => {
+                const results = Array.from(event.results);
+                const finalTranscript = results
+                    .filter(r => r.isFinal)
+                    .map(r => r[0]?.transcript || '')
+                    .join('').trim();
+                if (finalTranscript && finalTranscript !== lastTranscript) {
+                    insertContent(`<span>${finalTranscript} </span>`);
+                    lastTranscript = finalTranscript;
+                }
+            };
+            recognition.onerror = (event) => {
+                voiceButton.innerHTML = '<i class="ti ti-microphone"></i>';
+                voiceButton.dataset.listening = '0';
+                if (event.error === 'not-allowed') {
+                    alert('Autorisation du micro refusee. Autorisez le micro dans les parametres du navigateur.');
+                } else if (event.error === 'no-speech') {
+                    // silence, l'utilisateur n'a rien dit
+                } else if (event.error === 'aborted') {
+                    // ignore
+                } else {
+                    console.warn('Dictée erreur:', event.error);
+                }
+            };
+            try {
                 recognition.start();
+            } catch (e) {
+                voiceButton.innerHTML = '<i class="ti ti-microphone"></i>';
+                voiceButton.dataset.listening = '0';
+                alert('Impossible de demarrer la dictee. Verifiez le micro et les permissions.');
+            }
         });
 
         templateManagerButton?.addEventListener('click', () => {

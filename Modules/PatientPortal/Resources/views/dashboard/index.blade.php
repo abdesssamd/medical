@@ -55,10 +55,23 @@
             </div>
         </div>
 
+        @if($viewerAvailable)
+            <div class="portal-section portal-panel" style="margin-top:16px;">
+                <div class="portal-eyebrow">Images DICOM</div>
+                <div style="font-weight:900; font-size:1.08rem; margin-bottom:12px;">Visualisation des images de votre examen</div>
+                <div style="border:1px solid #dbe8f3; border-radius:18px; overflow:hidden; background:#f8fafc;">
+                    <iframe src="{{ $viewerUrl }}" style="width:100%; height:560px; border:0;" allowfullscreen title="Viewer DICOM"></iframe>
+                </div>
+                <div class="portal-footer-note" style="margin-top:10px;">
+                    <a href="{{ route('patient-portal.results.viewer') }}" target="_blank">Ouvrir en plein écran &rarr;</a>
+                </div>
+            </div>
+        @endif
+
         <div class="portal-section portal-panel">
             <div class="portal-eyebrow">Conseils</div>
             <ul class="portal-list">
-                <li>Conservez votre code d’accès jusqu’à la récupération de votre compte-rendu.</li>
+                <li>Conservez votre code d'accès jusqu'à la récupération de votre compte-rendu.</li>
                 <li>Le PDF et les images proviennent du module RIS MediOffice.</li>
                 <li>En cas de difficulté, contactez le secrétariat ou le service radiologie.</li>
             </ul>
@@ -86,16 +99,23 @@
             </div>
         </div>
 
-        <div class="portal-section portal-panel">
-            <div class="portal-eyebrow">Accès images</div>
-            <div class="portal-footer-note">{{ $viewerAvailable ? 'Le viewer est disponible pour votre examen.' : 'Le viewer n’est pas encore disponible pour cet examen.' }}</div>
-            <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-                @if($viewerAvailable)
-                    <a href="{{ route('patient-portal.results.viewer') }}" class="portal-btn">Ouvrir le viewer</a>
-                @endif
-                <a href="{{ route('patient-portal.results.show') }}" class="portal-btn portal-btn-secondary">Voir la page résultats</a>
+        @if($viewerAvailable)
+            <div class="portal-section portal-panel">
+                <div class="portal-eyebrow">Images DICOM</div>
+                <div class="portal-footer-note">Les images sont visibles directement dans le tableau de bord ci-contre.</div>
+                <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <a href="{{ route('patient-portal.results.viewer') }}" class="portal-btn">Plein écran</a>
+                </div>
             </div>
-        </div>
+        @else
+            <div class="portal-section portal-panel">
+                <div class="portal-eyebrow">Images</div>
+                <div class="portal-footer-note">Le viewer n'est pas encore disponible pour cet examen.</div>
+                <div style="margin-top:14px;">
+                    <a href="{{ route('patient-portal.results.show') }}" class="portal-btn portal-btn-secondary">Voir le compte-rendu</a>
+                </div>
+            </div>
+        @endif
     </aside>
 </div>
 @endsection

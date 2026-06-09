@@ -4,6 +4,8 @@ use App\Http\Middleware\EnsureRisIsEnabled;
 use Illuminate\Support\Facades\Route;
 use Modules\RIS\Http\Controllers\RisAiController;
 use Modules\RIS\Http\Controllers\RisExamController;
+use Modules\RIS\Http\Controllers\RisModalityController;
+use Modules\RIS\Http\Controllers\RisProcedureController;
 use Modules\RIS\Http\Controllers\RisReportTemplateController;
 use Modules\RIS\Http\Controllers\RisWebhookController;
 
@@ -33,12 +35,27 @@ Route::middleware(['web', 'auth', EnsureRisIsEnabled::class])
         Route::post('/examens/{order}/ai/analyze', [RisAiController::class, 'analyze'])->name('exams.ai.analyze');
         Route::post('/examens/{order}/worklist', [RisExamController::class, 'syncWorklist'])->name('exams.worklist');
         Route::post('/examens/synchroniser-pacs', [RisExamController::class, 'syncSelectedPatientWithOrthanc'])->name('exams.sync-pacs');
+        Route::post('/examens/importer-orphan', [RisExamController::class, 'importOrphanStudy'])->name('exams.import-orphan');
 
         Route::get('/templates', [RisReportTemplateController::class, 'index'])->name('templates.index');
         Route::post('/templates', [RisReportTemplateController::class, 'store'])->name('templates.store');
         Route::get('/templates/{template}/edit', [RisReportTemplateController::class, 'edit'])->name('templates.edit');
         Route::put('/templates/{template}', [RisReportTemplateController::class, 'update'])->name('templates.update');
         Route::delete('/templates/{template}', [RisReportTemplateController::class, 'destroy'])->name('templates.destroy');
+
+        Route::prefix('parametrage')->name('parametrage.')->group(function (): void {
+            Route::get('/procedures', [RisProcedureController::class, 'index'])->name('procedures.index');
+            Route::post('/procedures', [RisProcedureController::class, 'store'])->name('procedures.store');
+            Route::get('/procedures/{procedure}/edit', [RisProcedureController::class, 'edit'])->name('procedures.edit');
+            Route::put('/procedures/{procedure}', [RisProcedureController::class, 'update'])->name('procedures.update');
+            Route::delete('/procedures/{procedure}', [RisProcedureController::class, 'destroy'])->name('procedures.destroy');
+
+            Route::get('/modalities', [RisModalityController::class, 'index'])->name('modalities.index');
+            Route::post('/modalities', [RisModalityController::class, 'store'])->name('modalities.store');
+            Route::get('/modalities/{modality}/edit', [RisModalityController::class, 'edit'])->name('modalities.edit');
+            Route::put('/modalities/{modality}', [RisModalityController::class, 'update'])->name('modalities.update');
+            Route::delete('/modalities/{modality}', [RisModalityController::class, 'destroy'])->name('modalities.destroy');
+        });
     });
 
 Route::middleware(['web', EnsureRisIsEnabled::class])

@@ -4,14 +4,14 @@
 <?php $__env->startSection('content'); ?>
     <style>
         :root {
-            --ris-accent: #0ea5e9;
-            --ris-accent-deep: #0369a1;
-            --ris-accent-soft: rgba(14, 165, 233, 0.10);
-            --ris-shell: #f6fbfe;
+            --ris-accent: #0d9488;
+            --ris-accent-deep: #0f766e;
+            --ris-accent-soft: rgba(13, 148, 136, 0.10);
+            --ris-shell: #f0fdfa;
             --ris-card: rgba(255, 255, 255, 0.88);
             --ris-ink: #0f172a;
             --ris-muted: #64748b;
-            --ris-line: rgba(219, 234, 246, 0.95);
+            --ris-line: rgba(204, 235, 229, 0.95);
         }
 
         .ris26-shell {
@@ -27,11 +27,15 @@
         }
 
         .ris26-card {
-            background: var(--ris-card);
-            border: 1px solid var(--ris-line);
-            border-radius: 24px;
-            box-shadow: 0 16px 50px rgba(15, 23, 42, 0.06);
-            backdrop-filter: blur(16px);
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
+        }
+
+        .ris26-card-flat {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
         }
 
         .ris26-panel {
@@ -40,8 +44,8 @@
 
         .ris26-hero {
             background:
-                radial-gradient(circle at top right, rgba(14, 165, 233, 0.16), transparent 30%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 255, 0.92));
+                radial-gradient(circle at top right, rgba(13, 148, 136, 0.16), transparent 30%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.92));
         }
 
         .ris26-eyebrow {
@@ -91,7 +95,7 @@
             color: #334155;
         }
 
-        .ris26-pill.is-ok { color: #0369a1; background: rgba(14, 165, 233, 0.10); border-color: rgba(14, 165, 233, 0.20); }
+        .ris26-pill.is-ok { color: #0f766e; background: rgba(13, 148, 136, 0.10); border-color: rgba(13, 148, 136, 0.20); }
         .ris26-pill.is-bad { color: #b91c1c; background: #fff1f2; border-color: #fecdd3; }
 
         .ris26-side-stack { display: grid; gap: 14px; }
@@ -168,9 +172,9 @@
             justify-content: space-between;
             gap: 16px;
             flex-wrap: wrap;
-            border: 1px solid rgba(14, 165, 233, 0.22);
+            border: 1px solid rgba(13, 148, 136, 0.22);
             border-radius: 22px;
-            background: rgba(14, 165, 233, 0.06);
+            background: rgba(13, 148, 136, 0.06);
             padding: 16px 18px;
         }
 
@@ -187,7 +191,7 @@
             border-radius: 18px;
             display: grid;
             place-items: center;
-            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            background: linear-gradient(135deg, #0d9488, #2dd4bf);
             color: #fff;
             font-weight: 800;
             overflow: hidden;
@@ -220,9 +224,8 @@
             position: relative;
             overflow: hidden;
             border-radius: 24px;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(219, 234, 246, 0.86);
             padding: 18px;
+            border: 0;
         }
 
         .ris26-kpi::after {
@@ -232,7 +235,6 @@
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            background: rgba(14, 165, 233, 0.08);
         }
 
         .ris26-kpi-top {
@@ -243,8 +245,8 @@
         }
 
         .ris26-kpi-label {
-            color: var(--ris-muted);
             font-size: 0.82rem;
+            font-weight: 700;
         }
 
         .ris26-kpi-value {
@@ -255,6 +257,36 @@
             letter-spacing: -0.04em;
         }
 
+        .ris26-kpi[data-kpi="total"]    { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .ris26-kpi[data-kpi="total"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="total"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="total"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .ris26-kpi[data-kpi="today"]   { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
+        .ris26-kpi[data-kpi="today"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="today"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="today"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .ris26-kpi[data-kpi="waiting"] { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; }
+        .ris26-kpi[data-kpi="waiting"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="waiting"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="waiting"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .ris26-kpi[data-kpi="received"] { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #fff; }
+        .ris26-kpi[data-kpi="received"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="received"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="received"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .ris26-kpi[data-kpi="done"]    { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #fff; }
+        .ris26-kpi[data-kpi="done"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="done"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="done"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
+        .ris26-kpi[data-kpi="urgent"]  { background: linear-gradient(135deg, #fa709a, #fee140); color: #fff; }
+        .ris26-kpi[data-kpi="urgent"]::after { background: rgba(255,255,255,0.10); }
+        .ris26-kpi[data-kpi="urgent"] .ris26-kpi-label { color: rgba(255,255,255,0.75); }
+        .ris26-kpi[data-kpi="urgent"] .ris26-kpi-icon  { background: rgba(255,255,255,0.15); color: #fff; }
+
         .ris26-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
@@ -264,45 +296,96 @@
 
         .ris26-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px;
+            border-collapse: collapse;
         }
 
         .ris26-table thead th {
-            padding: 0 14px 4px;
+            padding: 12px 16px;
             text-align: left;
-            font-size: 0.74rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ris-muted);
+            letter-spacing: 0.1em;
+            color: #64748b;
+            font-weight: 800;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
         }
 
+        .ris26-table thead th:first-child { border-radius: 14px 0 0 0; }
+        .ris26-table thead th:last-child  { border-radius: 0 14px 0 0; }
+
         .ris26-row {
-            background: rgba(255, 255, 255, 0.92);
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+            transition: background .15s ease, box-shadow .15s ease;
+        }
+
+        .ris26-row:hover {
+            background: rgba(13, 148, 136, 0.04);
+        }
+
+        .ris26-row-orphan td {
+            background: #fffbeb;
+        }
+
+        .ris26-row-orphan:hover td {
+            background: #fef3c7;
         }
 
         .ris26-row td {
-            padding: 16px 14px;
-            border-top: 1px solid rgba(219, 234, 246, 0.8);
-            border-bottom: 1px solid rgba(219, 234, 246, 0.8);
+            padding: 16px;
             vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .ris26-row td:first-child {
-            border-left: 1px solid rgba(219, 234, 246, 0.8);
-            border-top-left-radius: 20px;
-            border-bottom-left-radius: 20px;
+        .ris26-entity-title {
+            font-weight: 800;
+            font-size: 0.95rem;
         }
 
-        .ris26-row td:last-child {
-            border-right: 1px solid rgba(219, 234, 246, 0.8);
-            border-top-right-radius: 20px;
-            border-bottom-right-radius: 20px;
+        .ris26-entity-meta {
+            color: #94a3b8;
+            font-size: 0.82rem;
+            margin-top: 3px;
         }
 
-        .ris26-entity-title { font-weight: 800; }
-        .ris26-entity-meta { color: var(--ris-muted); font-size: 0.84rem; margin-top: 4px; }
+        .ris26-table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ris26-badge-count {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(13, 148, 136, 0.10);
+            color: #0f766e;
+            font-size: 0.82rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .ris26-table .ris26-patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ris26-table .ris26-patient-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0d9488, #2dd4bf);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 0.78rem;
+            flex: 0 0 auto;
+        }
 
         .ris26-chip {
             display: inline-flex;
@@ -319,7 +402,7 @@
 
         .ris26-chip-status-ordonne { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
         .ris26-chip-status-en_attente { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-        .ris26-chip-status-images_recues { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .ris26-chip-status-images_recues { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
         .ris26-chip-status-termine { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
         .ris26-chip-status-annule { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
         .ris26-chip-priority-routine { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
@@ -331,9 +414,9 @@
         }
 
         @keyframes ris26-pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.28); }
-            70% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(14, 165, 233, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.28); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(13, 148, 136, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
         }
 
         .ris26-row-actions {
@@ -360,15 +443,15 @@
         }
 
         .ris26-btn-primary {
-            background: linear-gradient(135deg, var(--ris-accent), #38bdf8);
+            background: linear-gradient(135deg, var(--ris-accent), #2dd4bf);
             border-color: transparent;
             color: #fff;
         }
 
         .ris26-btn-soft {
-            background: rgba(14, 165, 233, 0.08);
+            background: rgba(13, 148, 136, 0.08);
             color: var(--ris-accent-deep);
-            border-color: rgba(14, 165, 233, 0.18);
+            border-color: rgba(13, 148, 136, 0.18);
         }
 
         .ris26-reports {
@@ -377,16 +460,71 @@
         }
 
         .ris26-report-item {
-            border: 1px solid rgba(219, 234, 246, 0.86);
-            border-radius: 22px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             padding: 16px;
-            background: rgba(255, 255, 255, 0.94);
+            background: #fff;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .ris26-report-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
         }
 
         .ris26-empty {
-            padding: 38px 20px;
+            padding: 48px 20px;
             text-align: center;
-            color: var(--ris-muted);
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+
+        .ris26-pagination {
+            padding: 16px 0 4px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ris26-pagination nav [role="navigation"] {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .ris26-pagination nav span, .ris26-pagination nav a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #475569;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            transition: all .15s ease;
+        }
+
+        .ris26-pagination nav a:hover {
+            background: rgba(13, 148, 136, 0.08);
+            border-color: rgba(13, 148, 136, 0.3);
+            color: #0f766e;
+        }
+
+        .ris26-pagination nav span[aria-current="page"] {
+            background: #0d9488;
+            border-color: #0d9488;
+            color: #fff;
+        }
+
+        .ris26-pagination nav span:not([aria-current]) {
+            border-color: transparent;
+            background: transparent;
+            color: #94a3b8;
         }
 
         .ris26-filters {
@@ -426,9 +564,9 @@
             width: 64px;
             height: 64px;
             border-radius: 22px;
-            background: linear-gradient(135deg, var(--ris-accent), #38bdf8);
+            background: linear-gradient(135deg, var(--ris-accent), #2dd4bf);
             color: #fff;
-            box-shadow: 0 26px 44px rgba(14, 165, 233, 0.30);
+            box-shadow: 0 26px 44px rgba(13, 148, 136, 0.30);
             display: grid;
             place-items: center;
             cursor: pointer;
@@ -508,7 +646,7 @@
 
         .ris26-result:hover,
         .ris26-result.is-active {
-            background: rgba(14, 165, 233, 0.08);
+            background: rgba(13, 148, 136, 0.08);
         }
 
         .ris26-result-title {
@@ -663,6 +801,17 @@
                     </div>
                 </article>
 
+                <a href="<?php echo e(route('patient-portal.admin.index')); ?>" class="ris26-spotlight-trigger" style="text-decoration:none;">
+                    <span class="ris26-spotlight-trigger-main">
+                        <span class="ris26-spotlight-icon"><i class="ti ti-door-enter"></i></span>
+                        <span class="ris26-spotlight-copy">
+                            <strong>Portail patient</strong>
+                            <span>Accéder à la gestion des accès patient, codes et mémo.</span>
+                        </span>
+                    </span>
+                    <span class="ris26-kbd">Admin</span>
+                </a>
+
                 <button type="button" class="ris26-spotlight-trigger" id="ris26SpotlightTrigger">
                     <span class="ris26-spotlight-trigger-main">
                         <span class="ris26-spotlight-icon"><i class="ti ti-search"></i></span>
@@ -708,28 +857,28 @@
 
         <section class="ris26-kpis">
             <?php $__currentLoopData = $kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <article class="ris26-kpi">
+                <article class="ris26-kpi" data-kpi="<?php echo e($kpi['key']); ?>">
                     <div class="ris26-kpi-top">
                         <div class="ris26-kpi-label"><?php echo e($kpi['label']); ?></div>
                         <div class="ris26-kpi-icon"><i class="<?php echo e($kpi['icon']); ?>"></i></div>
                     </div>
-                    <div class="ris26-kpi-value" data-kpi="<?php echo e($kpi['key']); ?>"><?php echo e($kpi['value']); ?></div>
+                    <div class="ris26-kpi-value" data-kpi-value="<?php echo e($kpi['key']); ?>"><?php echo e($kpi['value']); ?></div>
                 </article>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </section>
 
-        <section class="ris26-card">
+        <section class="ris26-card ris26-card-flat">
             <div class="ris26-panel">
-                <div class="ris26-toolbar" id="ris26FiltersAnchor" style="margin-bottom: 14px;">
+                <div class="ris26-toolbar" id="ris26FiltersAnchor" style="margin-bottom: 16px;">
                     <div>
-                        <div class="ris26-entity-title">Filtres de lecture</div>
-                        <div class="ris26-entity-meta">Gardez la file visible et épurée, puis ouvrez le panneau latéral pour créer une nouvelle demande.</div>
+                        <div class="ris26-entity-title" style="font-size:1.1rem;">Filtres de lecture</div>
+                        <div class="ris26-entity-meta">Affinez la liste des examens par texte, statut, priorité ou modalité.</div>
                     </div>
                 </div>
 
                 <form method="GET" class="ris26-filters">
                     <div class="ris26-field">
-                        <label>Filtre texte</label>
+                        <label>Recherche</label>
                         <input type="text" name="search" value="<?php echo e($filters['search']); ?>" placeholder="Patient, MRN, accession, acte...">
                     </div>
                     <div class="ris26-field">
@@ -746,7 +895,7 @@
                         <select name="priority">
                             <option value="">Toutes</option>
                             <?php $__currentLoopData = $priorityLabels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $priorityValue => $priorityLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($priorityValue); ?>" <?php if($filters['priority'] === $priorityValue): echo 'selected'; endif; ?>><?php echo e($priorityLabel); ?></option>
+                                <option value="<?php echo e($priorityValue); ?>" <?php if(old('priority', \Modules\RIS\Models\RisOrder::PRIORITY_ROUTINE) === $priorityValue): echo 'selected'; endif; ?>><?php echo e($priorityLabel); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
@@ -764,6 +913,12 @@
                             <input type="checkbox" name="include_orphan" value="1" <?php if($filters['include_orphan']): echo 'checked'; endif; ?> style="width: 18px; height: 18px; border-radius: 6px; accent-color: var(--ris-accent);">
                             <span>Inclure les instances <span style="color: var(--ris-accent-deep);">PACS</span> non liees au RIS</span>
                         </label>
+                        <?php if($filters['include_orphan'] && $orphanStudiesError): ?>
+                            <div style="margin-top:6px; font-size:0.78rem; color:#b91c1c; font-weight:700;">
+                                <i class="ti ti-alert-triangle"></i> <?php echo e($orphanStudiesError); ?>
+
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <div class="ris26-actions" style="align-self: end;">
                         <button type="submit" class="ris26-btn ris26-btn-primary">Filtrer</button>
@@ -776,11 +931,12 @@
         <section class="ris26-grid">
             <section class="ris26-card">
                 <div class="ris26-panel">
-                    <div class="ris26-toolbar" style="margin-bottom: 14px;">
+                    <div class="ris26-table-header">
                         <div>
-                            <div class="ris26-entity-title">File d’examens RIS</div>
-                            <div class="ris26-entity-meta">La liste se met à jour automatiquement en arrière-plan. Les nouveaux examens ayant reçu leurs images pulsent discrètement.</div>
+                            <div class="ris26-entity-title" style="font-size:1.1rem;">File d’examens RIS</div>
+                            <div class="ris26-entity-meta">Les nouveaux examens ayant reçu leurs images pulsent discrètement.</div>
                         </div>
+                        <span class="ris26-badge-count"><?php echo e($orders->total()); ?> examen(s)</span>
                     </div>
 
                     <div style="overflow-x: auto;">
@@ -789,7 +945,7 @@
                                 <tr>
                                     <th>Accession</th>
                                     <th>Patient</th>
-                                    <th>Acte / modalite</th>
+                                    <th>Examen</th>
                                     <th>Planification</th>
                                     <th>Statut</th>
                                     <th style="text-align: right;">Actions</th>
@@ -806,15 +962,23 @@
                                         $viewerUrl = $viewerStudyId
                                             ? rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/').'/stone-webviewer/index.html?study='.urlencode((string) $viewerStudyId)
                                             : null;
+                                        $patientInitials = $order->patient
+                                            ? \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr((string) $order->patient->first_name, 0, 1).\Illuminate\Support\Str::substr((string) $order->patient->last_name, 0, 1))
+                                            : '?';
                                     ?>
                                     <tr class="ris26-row" data-order-row data-order-id="<?php echo e($order->id); ?>" data-order-status="<?php echo e($order->status); ?>">
                                         <td>
                                             <div class="ris26-entity-title"><?php echo e($order->accession_number ?: 'RIS-'.$order->id); ?></div>
-                                            <div class="ris26-entity-meta">Demande <?php echo e(optional($order->requested_at)->format('d/m/Y H:i')); ?></div>
+                                            <div class="ris26-entity-meta"><?php echo e(optional($order->requested_at)->format('d/m/Y H:i')); ?></div>
                                         </td>
                                         <td>
-                                            <div class="ris26-entity-title"><?php echo e($order->patient?->full_name ?? 'Patient inconnu'); ?></div>
-                                            <div class="ris26-entity-meta"><?php echo e($order->patient?->medical_record_number); ?> | <?php echo e($order->patient?->phone); ?></div>
+                                            <div class="ris26-patient-cell">
+                                                <span class="ris26-patient-avatar"><?php echo e($patientInitials); ?></span>
+                                                <div>
+                                                    <div class="ris26-entity-title"><?php echo e($order->patient?->full_name ?? 'Patient inconnu'); ?></div>
+                                                    <div class="ris26-entity-meta"><?php echo e($order->patient?->medical_record_number); ?> <?php echo e($order->patient?->phone ? '| '.$order->patient->phone : ''); ?></div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="ris26-entity-title"><?php echo e($order->procedure?->label ?? 'Acte non defini'); ?></div>
@@ -860,11 +1024,11 @@
 
                                 <?php if($orphanStudies->isNotEmpty()): ?>
                                     <tr>
-                                        <td colspan="6" style="padding: 20px 14px 6px;">
+                                        <td colspan="6" style="padding: 24px 16px 8px;">
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                                                <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
                                                 <span style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; font-weight: 800;">
-                                                    Études PACS orphelines (non liées au RIS) — <?php echo e($orphanStudies->count()); ?> trouvée(s)
+                                                    Études PACS orphelines — <?php echo e($orphanStudies->count()); ?> trouvée(s)
                                                 </span>
                                             </div>
                                         </td>
@@ -881,10 +1045,10 @@
                                                 ? substr($study->study_date, 0, 4).'/'.substr($study->study_date, 4, 2).'/'.substr($study->study_date, 6, 2)
                                                 : ($study->study_date ?: 'Date inconnue');
                                         ?>
-                                        <tr class="ris26-row" style="background: rgba(255, 247, 237, 0.6);">
+                                        <tr class="ris26-row ris26-row-orphan">
                                             <td>
                                                 <div class="ris26-entity-title"><?php echo e($study->accession_number ?: 'PACS-'.$study->orthanc_study_id); ?></div>
-                                                <div class="ris26-entity-meta">Étude du <?php echo e($studyDate); ?></div>
+                                                <div class="ris26-entity-meta"><?php echo e($studyDate); ?></div>
                                             </td>
                                             <td>
                                                 <div class="ris26-entity-title"><?php echo e($study->patient_name ?: 'Patient inconnu'); ?></div>
@@ -909,6 +1073,20 @@
                                                     <?php if($studyViewerUrl): ?>
                                                         <a href="<?php echo e($studyViewerUrl); ?>" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
                                                     <?php endif; ?>
+                                                    <form method="POST" action="<?php echo e(route('ris.exams.import-orphan')); ?>" style="display:inline;">
+                                                        <?php echo csrf_field(); ?>
+                                                        <input type="hidden" name="orthanc_study_id" value="<?php echo e($study->orthanc_study_id); ?>">
+                                                        <input type="hidden" name="study_uid" value="<?php echo e($study->study_uid); ?>">
+                                                        <input type="hidden" name="patient_id" value="<?php echo e($study->patient_id); ?>">
+                                                        <input type="hidden" name="patient_name" value="<?php echo e($study->patient_name); ?>">
+                                                        <input type="hidden" name="accession_number" value="<?php echo e($study->accession_number); ?>">
+                                                        <input type="hidden" name="study_description" value="<?php echo e($study->study_description); ?>">
+                                                        <input type="hidden" name="modality" value="<?php echo e($study->modality); ?>">
+                                                        <input type="hidden" name="study_date" value="<?php echo e($study->study_date); ?>">
+                                                        <button type="submit" class="ris26-btn" style="background:#0d9488;color:#fff;border-color:#0d9488;" onclick="return confirm('Importer cette étude PACS dans le RIS ? Un nouvel examen urgent sera créé.');">
+                                                            <i class="ti ti-plus"></i> Importer
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
@@ -918,8 +1096,10 @@
                         </table>
                     </div>
 
-                    <?php echo e($orders->links()); ?>
+                    <div class="ris26-pagination">
+                        <?php echo e($orders->links()); ?>
 
+                    </div>
                 </div>
             </section>
 
@@ -1055,6 +1235,10 @@
                                 <div class="ris26-field">
                                     <label>Telephone</label>
                                     <input type="text" id="ris26NewPhone" placeholder="0600000000" style="width: 100%;">
+                                </div>
+                                <div class="ris26-field">
+                                    <label>Email</label>
+                                    <input type="email" id="ris26NewEmail" placeholder="patient@exemple.com" style="width: 100%;">
                                 </div>
                                 <div class="ris26-field full" style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 6px;">
                                     <button type="button" id="ris26NewPatientCancel" class="ris26-btn">Annuler</button>
@@ -1285,7 +1469,7 @@
 
             const updateLiveUi = (payload) => {
                 Object.entries(payload.stats || {}).forEach(([key, value]) => {
-                    const node = document.querySelector(`[data-kpi="${key}"]`);
+                    const node = document.querySelector(`[data-kpi-value="${key}"]`);
                     if (node) {
                         node.textContent = value;
                     }
@@ -1421,7 +1605,7 @@
                 }
                 resultsContainer.innerHTML = patients.map(p =>
                     `<button type="button" class="ris26-patient-result" data-id="${p.id}" data-name="${p.full_name}" data-mrn="${p.medical_record_number || ''}" data-info="${p.phone || ''}" style="display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: transparent; padding: 10px 14px; text-align: left; cursor: pointer; border-bottom: 1px solid #f1f5f9;">
-                        <span style="width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 0.82rem; flex: 0 0 auto;">${p.initials || 'P'}</span>
+                        <span style="width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #0d9488, #2dd4bf); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 0.82rem; flex: 0 0 auto;">${p.initials || 'P'}</span>
                         <span>
                             <strong style="display: block; font-size: 0.92rem;">${p.full_name}</strong>
                             <span style="color: #64748b; font-size: 0.82rem;">${p.medical_record_number || '-'} ${p.phone ? '| ' + p.phone : ''}</span>
@@ -1500,6 +1684,7 @@
                 document.getElementById('ris26NewLastName').value = '';
                 document.getElementById('ris26NewDob').value = '';
                 document.getElementById('ris26NewPhone').value = '';
+                document.getElementById('ris26NewEmail').value = '';
             });
 
             saveNewBtn.addEventListener('click', async () => {
@@ -1507,6 +1692,7 @@
                 const lastName = document.getElementById('ris26NewLastName').value.trim();
                 const dob = document.getElementById('ris26NewDob').value;
                 const phone = document.getElementById('ris26NewPhone').value.trim();
+                const email = document.getElementById('ris26NewEmail').value.trim();
 
                 if (!firstName || !lastName || !dob) {
                     saveNewBtn.textContent = 'Champs obligatoires manquants';
@@ -1525,7 +1711,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrf,
                         },
-                        body: JSON.stringify({ first_name: firstName, last_name: lastName, date_of_birth: dob, phone: phone }),
+                        body: JSON.stringify({ first_name: firstName, last_name: lastName, date_of_birth: dob, phone: phone, email: email }),
                     });
                     const data = await res.json();
                     if (data.ok && data.patient) {

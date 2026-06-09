@@ -17,6 +17,7 @@ use Illuminate\View\View;
 use Modules\RIS\Models\RisModality;
 use Modules\RIS\Models\RisOrder;
 use Modules\RIS\Models\RisProcedure;
+use Modules\PatientPortal\Models\PatientPortalAccess;
 use Modules\RIS\Models\RisReport;
 use Modules\RIS\Models\RisReportTemplate;
 use Modules\RIS\Services\OrthancService;
@@ -73,9 +74,12 @@ class RisExamController extends Controller
             ->withQueryString();
 
         $orphanStudies = collect();
+        $orphanStudiesError = null;
         if ($includeOrphan) {
             $orthancStudies = $orthancService->listAllStudies(100);
-            if (($orthancStudies['ok'] ?? false) && ! empty($orthancStudies['studies'])) {
+            if (! ($orthancStudies['ok'] ?? false)) {
+                $orphanStudiesError = $orthancStudies['message'] ?? 'Requête PACS trop lente ou indisponible.';
+            } elseif (! empty($orthancStudies['studies'])) {
                 $existingAccessions = RisOrder::query()
                     ->whereNotNull('accession_number')
                     ->where('accession_number', '!=', '')
@@ -187,6 +191,7 @@ class RisExamController extends Controller
             'statusLabels' => RisOrder::statusLabels(),
             'priorityLabels' => RisOrder::priorityLabels(),
             'orphanStudies' => $orphanStudies,
+            'orphanStudiesError' => $orphanStudiesError,
         ]);
     }
 
@@ -375,6 +380,10 @@ class RisExamController extends Controller
             ->orderBy('title')
             ->get();
 
+        $portalAccess = \Modules\PatientPortal\Models\PatientPortalAccess::query()
+            ->where('order_id', $order->id)
+            ->first();
+
         return view('ris::exams.show', [
             'order' => $order,
             'patientStudies' => $patientStudies,
@@ -386,6 +395,7 @@ class RisExamController extends Controller
                 ->whereIn('role', ['professional', 'doctor', 'medecin', 'admin', 'super_admin'])
                 ->orderBy('name')
                 ->get(['id', 'name', 'professional_title']),
+            'portalAccess' => $portalAccess,
         ]);
     }
 
@@ -468,6 +478,7 @@ class RisExamController extends Controller
             'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
             'gender' => ['nullable', 'string', 'max:20'],
             'phone' => ['nullable', 'string', 'max:40'],
+            'email' => ['nullable', 'email', 'max:191'],
             'cin' => ['nullable', 'string', 'max:60'],
         ]);
 
@@ -479,6 +490,7 @@ class RisExamController extends Controller
                     'date_of_birth' => $validated['date_of_birth'],
                     'gender' => $validated['gender'] ?? null,
                     'phone' => $validated['phone'] ?? null,
+                    'email' => $validated['email'] ?? null,
                     'cin' => $validated['cin'] ?? null,
                     'is_active' => true,
                 ]);
@@ -498,6 +510,86 @@ class RisExamController extends Controller
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    public function importOrphanStudy(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'orthanc_study_id' => ['required', 'string', 'max:191'],
+            'study_uid' => ['nullable', 'string', 'max:191'],
+            'patient_id' => ['required', 'string', 'max:191'],
+            'patient_name' => ['nullable', 'string', 'max:255'],
+            'accession_number' => ['nullable', 'string', 'max:191'],
+            'study_description' => ['nullable', 'string', 'max:512'],
+            'modality' => ['nullable', 'string', 'max:64'],
+            'study_date' => ['nullable', 'string', 'max:16'],
+        ]);
+
+        $patient = Patient::query()
+            ->where('medical_record_number', $validated['patient_id'])
+            ->orWhere('cin', $validated['patient_id'])
+            ->first();
+
+        if (! $patient) {
+            $nameParts = explode(' ', (string) ($validated['patient_name'] ?? 'Patient PACS'), 2);
+            $patient = Patient::query()->create([
+                'first_name' => $nameParts[0] ?: 'PACS',
+                'last_name' => $nameParts[1] ?? $validated['patient_id'],
+                'date_of_birth' => now()->subYears(30)->toDateString(),
+                'medical_record_number' => $validated['patient_id'],
+                'is_active' => true,
+            ]);
+        }
+
+        $accession = trim((string) ($validated['accession_number'] ?? ''));
+        if ($accession === '') {
+            do {
+                $accession = 'IMP-'.now()->format('Ymd').'-'.Str::upper(Str::random(5));
+            } while (RisOrder::query()->where('accession_number', $accession)->exists());
+        }
+
+        $modality = RisModality::query()
+            ->where('ae_title', 'like', '%'.$validated['modality'].'%')
+            ->orWhere('name', 'like', '%'.$validated['modality'].'%')
+            ->first();
+
+        $procedure = RisProcedure::query()
+            ->where('label', 'like', '%'.$validated['study_description'].'%')
+            ->orWhere('code', 'like', '%'.$validated['modality'].'%')
+            ->first();
+
+        if (! $modality || ! $procedure) {
+            return back()->with('error', 'Aucune modalité ou acte RIS correspondant trouvé. Créez-les d\'abord dans Paramétrages.');
+        }
+
+        $order = DB::transaction(function () use ($patient, $modality, $procedure, $accession, $validated): RisOrder {
+            return RisOrder::query()->create([
+                'patient_id' => $patient->id,
+                'procedure_id' => $procedure->id,
+                'modality_id' => $modality->id,
+                'accession_number' => $accession,
+                'priority' => RisOrder::PRIORITY_URGENT,
+                'status' => RisOrder::STATUS_IMAGES_RECUES,
+                'received_at' => now(),
+                'requested_at' => now(),
+                'requested_by_user_id' => Auth::id(),
+                'orthanc_payload' => [
+                    'source' => 'orphan_import',
+                    'imported_at' => now()->toIso8601String(),
+                    'imported_by' => Auth::id(),
+                    'orthanc_study_id' => $validated['orthanc_study_id'],
+                    'study_uid' => $validated['study_uid'],
+                    'study_date' => $validated['study_date'],
+                    'original_patient_id' => $validated['patient_id'],
+                    'original_patient_name' => $validated['patient_name'],
+                    'original_accession' => $validated['accession_number'],
+                ],
+            ]);
+        });
+
+        return redirect()
+            ->route('ris.exams.show', $order)
+            ->with('success', 'Étude PACS importée avec succès (urgent, images déjà reçues).');
     }
 
     public function syncSelectedPatientWithOrthanc(Request $request, OrthancService $orthancService): RedirectResponse

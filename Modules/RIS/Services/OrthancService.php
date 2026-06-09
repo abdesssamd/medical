@@ -232,7 +232,7 @@ class OrthancService
     public function listAllStudies(int $limit = 100): array
     {
         try {
-            $response = $this->client()->post('/tools/find', [
+            $response = $this->client()->timeout(30)->post('/tools/find', [
                 'Level' => 'Study',
                 'Expand' => true,
                 'Limit' => $limit,

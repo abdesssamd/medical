@@ -656,11 +656,12 @@
             ['label' => 'File d\'attente', 'icon' => 'ti ti-list-numbers', 'route' => 'admin.dashboard', 'active' => 'admin.*'],
             ['label' => 'Paramétrages', 'icon' => 'ti ti-settings-automation', 'submenu' => [
                 ['label' => 'Utilisateurs', 'route' => 'users.index', 'active' => 'users.*'],
-				['label' => 'Template ris', 'route' => 'users.index', 'active' => 'users.*'],
+				['label' => 'Templates RIS', 'route' => 'ris.templates.index', 'active' => 'ris.templates.*'],
                 ['label' => 'Questionnaires', 'route' => 'clinical.questionnaire-templates.index', 'active' => 'clinical.questionnaire-templates.*'],
                 
 				['label' => 'Paramètres généraux', 'icon' => 'ti ti-adjustments', 'submenu' => [
-                    ['label' => 'Liste des actes', 'route' => 'procedures.index', 'active' => 'procedures.*'],
+                    ['label' => 'Actes RIS', 'route' => 'ris.parametrage.procedures.index', 'active' => 'ris.parametrage.procedures.*'],
+                    ['label' => 'Modalités RIS', 'route' => 'ris.parametrage.modalities.index', 'active' => 'ris.parametrage.modalities.*'],
                     ['label' => 'Liste des médicaments', 'route' => 'admin.medications.index', 'active' => 'admin.medications.*'],
                     ['label' => 'Liste des codes CIM-10', 'route' => 'admin.icd10-codes.index', 'active' => 'admin.icd10-codes.*'],
                 ]],

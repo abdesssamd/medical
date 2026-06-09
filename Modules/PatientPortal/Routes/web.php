@@ -33,4 +33,5 @@ Route::middleware(['web', 'auth', EnsureRisIsEnabled::class, EnsureRole::class.'
         Route::get('/', [PatientPortalAdminController::class, 'index'])->name('index');
         Route::get('/{access}', [PatientPortalAdminController::class, 'show'])->name('show');
         Route::get('/{access}/memo', [PatientPortalAdminController::class, 'memo'])->name('memo');
+        Route::post('/{access}/send-email', [PatientPortalAdminController::class, 'sendEmail'])->name('send-email');
     });

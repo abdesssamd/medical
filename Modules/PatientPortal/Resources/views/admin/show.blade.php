@@ -41,6 +41,12 @@
             <a class="ppd-btn" href="{{ route('patient-portal.admin.index') }}">Retour</a>
             <a class="ppd-btn ppd-btn-primary" href="{{ route('patient-portal.admin.memo', $access) }}" target="_blank">Imprimer mémo</a>
             <a class="ppd-btn" href="{{ route('patient-portal.login', ['token' => $access->access_token]) }}" target="_blank">Ouvrir portail</a>
+            <form method="POST" action="{{ route('patient-portal.admin.send-email', $access) }}" style="display:inline;">
+                @csrf
+                <button type="submit" class="ppd-btn" {{ ! $access->patient?->email ? 'disabled' : '' }}>
+                    Envoyer par email
+                </button>
+            </form>
         </div>
     </section>
 
@@ -52,6 +58,7 @@
                 <div class="ppd-stat"><div class="ppd-label">Lien portail</div><div class="ppd-value" style="word-break:break-all;">{{ $portalUrl }}</div></div>
                 <div class="ppd-stat"><div class="ppd-label">Expiration</div><div class="ppd-value">{{ optional($access->expires_at)->format('d/m/Y H:i') ?: '-' }}</div></div>
                 <div class="ppd-stat"><div class="ppd-label">Dernière ouverture</div><div class="ppd-value">{{ optional($access->last_access_at)->format('d/m/Y H:i') ?: '-' }}</div></div>
+                <div class="ppd-stat"><div class="ppd-label">Email patient</div><div class="ppd-value">{{ $access->patient?->email ?: 'Non renseigné' }}</div></div>
                 <div class="ppd-stat"><div class="ppd-label">Canal</div><div class="ppd-value">{{ $access->delivery_channel }}</div></div>
                 <div class="ppd-stat"><div class="ppd-label">Accès verrouillé</div><div class="ppd-value">{{ $access->locked_until_at ? optional($access->locked_until_at)->format('d/m/Y H:i') : 'Non' }}</div></div>
             </div>

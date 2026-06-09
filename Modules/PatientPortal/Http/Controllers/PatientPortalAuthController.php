@@ -11,7 +11,7 @@ use Modules\PatientPortal\Services\PatientPortalAccessService;
 
 class PatientPortalAuthController extends Controller
 {
-    public function showLogin(Request $request, ?string $token = null): View
+    public function showLogin(Request $request, ?string $token = null): View|RedirectResponse
     {
         $entryToken = $token ?: trim((string) $request->query('token', ''));
 

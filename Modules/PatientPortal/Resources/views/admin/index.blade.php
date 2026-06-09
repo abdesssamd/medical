@@ -105,6 +105,9 @@
                                     <td>
                                         <strong>{{ $access->patient?->full_name ?? '-' }}</strong><br>
                                         <span class="ppx-small">MRN {{ $access->patient?->medical_record_number ?? '-' }}</span>
+                                        @if($access->patient?->email)
+                                            <br><span class="ppx-small"><i class="ti ti-mail"></i> {{ $access->patient->email }}</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <strong>{{ $access->order?->procedure?->label ?? 'Examen' }}</strong><br>
@@ -142,7 +145,7 @@
                         <div class="ppx-log-item">
                             <strong>{{ $access->patient?->full_name ?? '-' }}</strong>
                             <div class="ppx-small">{{ $access->logs->first()?->event_type ?? 'aucun événement' }} • {{ optional($access->last_access_at)->format('d/m/Y H:i') ?: '-' }}</div>
-                            <div class="ppx-small">{{ $access->patient?->medical_record_number ?? '-' }}</div>
+                            <div class="ppx-small">{{ $access->patient?->medical_record_number ?? '-' }}{{ $access->patient?->email ? ' | ✉ '.$access->patient->email : '' }}</div>
                         </div>
                     @empty
                         <div class="ppx-small">Aucune activité récente.</div>

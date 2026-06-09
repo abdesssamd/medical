@@ -3,8 +3,11 @@
 namespace Modules\PatientPortal\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Modules\PatientPortal\Mail\PatientPortalAccessMail;
 use Modules\PatientPortal\Models\PatientPortalAccess;
 use Modules\PatientPortal\Services\PatientPortalAccessService;
 
@@ -55,7 +58,7 @@ class PatientPortalAdminController extends Controller
         ];
 
         $recentLogs = PatientPortalAccess::query()
-            ->with(['patient', 'logs' => fn ($logQuery) => $logQuery->latest()->limit(8)])
+            ->with(['patient', 'logs' => fn ($logQuery) => $logQuery->latest()])
             ->whereHas('logs')
             ->latest('last_access_at')
             ->limit(8)
@@ -87,5 +90,30 @@ class PatientPortalAdminController extends Controller
             'qrCodeSvg' => $service->buildLoginQrSvg($access),
             'printableCode' => $service->getPrintableAccessCode($access),
         ]);
+    }
+
+    public function sendEmail(PatientPortalAccess $access, PatientPortalAccessService $service): RedirectResponse
+    {
+        $patient = $access->patient;
+        $email = $patient?->email;
+
+        if (! $email) {
+            return back()->with('error', 'Aucune adresse email renseignée pour ce patient.');
+        }
+
+        $plainCode = $service->getPrintableAccessCode($access);
+
+        if (! $plainCode) {
+            return back()->with('error', 'Impossible de décrypter le code d\'accès.');
+        }
+
+        Mail::to($email)->send(new PatientPortalAccessMail($access, $plainCode));
+
+        $service->markAccessed($access, 'email_sent', [
+            'to' => $email,
+            'delivery' => 'direct',
+        ]);
+
+        return back()->with('success', "Email envoyé à {$email} avec les informations d'accès.");
     }
 }
