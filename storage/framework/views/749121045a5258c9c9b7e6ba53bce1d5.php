@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0f5d4d">
     <link rel="manifest" href="/manifest.webmanifest">
-    <title>{{ __('queue.login') }} — MedOffice</title>
-    @vite(['resources/scss/app.scss', 'resources/css/app.css', 'resources/js/app.js'])
+    <title><?php echo e(__('queue.login')); ?> — MedOffice</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/scss/app.scss', 'resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
 <body class="login-page">
 <div class="login-wrap">
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="brand-footer">
-                <a href="{{ route('public.appointment.landing') }}" class="brand-link">
+                <a href="<?php echo e(route('public.appointment.landing')); ?>" class="brand-link">
                     <i class="ti ti-arrow-left"></i> Retour à l'accueil
                 </a>
             </div>
@@ -51,24 +51,24 @@
     <div class="login-form-panel">
         <div class="form-container">
             <div class="form-header">
-                <h2 class="form-title">{{ __('queue.login') }}</h2>
-                <p class="form-subtitle">{{ __('queue.login_hint') }}</p>
+                <h2 class="form-title"><?php echo e(__('queue.login')); ?></h2>
+                <p class="form-subtitle"><?php echo e(__('queue.login_hint')); ?></p>
             </div>
 
-            <form method="POST" action="{{ route('login.attempt') }}" autocomplete="off" novalidate>
-                @csrf
+            <form method="POST" action="<?php echo e(route('login.attempt')); ?>" autocomplete="off" novalidate>
+                <?php echo csrf_field(); ?>
 
                 <div class="field-group">
                     <label class="field-label" for="email">Email</label>
                     <div class="field-input-wrap">
                         <i class="ti ti-mail field-icon"></i>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required
+                        <input id="email" name="email" type="email" value="<?php echo e(old('email')); ?>" required
                                class="field-input" placeholder="exemple@cabinet.fr">
                     </div>
                 </div>
 
                 <div class="field-group">
-                    <label class="field-label" for="password">{{ __('queue.password') }}</label>
+                    <label class="field-label" for="password"><?php echo e(__('queue.password')); ?></label>
                     <div class="field-input-wrap">
                         <i class="ti ti-lock field-icon"></i>
                         <input id="password" name="password" type="password" required
@@ -81,21 +81,22 @@
 
                 <label class="check-line">
                     <input type="checkbox" name="remember">
-                    <span>{{ __('queue.remember_me') }}</span>
+                    <span><?php echo e(__('queue.remember_me')); ?></span>
                 </label>
 
                 <button type="submit" class="submit-btn">
-                    <span>{{ __('queue.login') }}</span>
+                    <span><?php echo e(__('queue.login')); ?></span>
                     <i class="ti ti-arrow-right"></i>
                 </button>
             </form>
 
-            @if(isset($errors) && $errors->any())
+            <?php if(isset($errors) && $errors->any()): ?>
                 <div class="error-msg">
                     <i class="ti ti-alert-circle"></i>
-                    {{ $errors->first() }}
+                    <?php echo e($errors->first()); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
 
             <div class="demo-creds">
                 <div class="creds-header">
@@ -436,3 +437,4 @@ function togglePassword() {
 </style>
 </body>
 </html>
+<?php /**PATH E:\xamp8.1\htdocs\medical\Modules\Queue\Resources\views/auth/login.blade.php ENDPATH**/ ?>

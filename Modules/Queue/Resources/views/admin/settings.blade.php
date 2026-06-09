@@ -11,6 +11,7 @@
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <a class="btn btn-outline-secondary" href="{{ route('admin.settings.questionnaires') }}">Administration questionnaires</a>
+            <a class="btn btn-outline-primary" href="{{ route('admin.planning.settings') }}">Paramétrage des plannings</a>
             <a class="btn btn-outline-primary" href="{{ route('care.module1.index') }}">Retour module 1</a>
         </div>
     </section>

@@ -37,6 +37,7 @@ class Appointment extends Model
         'consulted_at',
         'queue_ticket_id',
         'room_id',
+        'appointment_request_id',
     ];
 
     protected $casts = [
@@ -84,6 +85,11 @@ class Appointment extends Model
     public function followUpAppointments(): HasMany
     {
         return $this->hasMany(Appointment::class, 'parent_appointment_id');
+    }
+
+    public function appointmentRequest(): BelongsTo
+    {
+        return $this->belongsTo(AppointmentRequest::class);
     }
 
     public function room(): BelongsTo

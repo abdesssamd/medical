@@ -15,7 +15,8 @@ use Modules\Scheduling\Models\AvailabilityBlock;
 class BookingService
 {
     public function __construct(
-        private readonly AvailabilityService $availabilityService
+        private readonly AvailabilityService $availabilityService,
+        private readonly FlexiblePlanningService $flexiblePlanningService
     ) {
     }
 
@@ -29,8 +30,13 @@ class BookingService
         $startTime = Carbon::parse($data['start_time'])->format('H:i:s');
         $appointmentTypeId = $data['appointment_type_id'] ?? null;
 
-        // Validate availability
-        $this->availabilityService->ensureSlotIsAvailable($practitionerId, $date, $startTime);
+        // V2: validate using flexible planning
+        try {
+            $this->validateSlotWithFlexiblePlanning($practitionerId, $date, $startTime, $appointmentTypeId);
+        } catch (\RuntimeException $e) {
+            // Fallback to classic validation if flexible planning fails
+            $this->availabilityService->ensureSlotIsAvailable($practitionerId, $date, $startTime);
+        }
 
         // Resolve or create patient
         $patientId = $data['patient_id'] ?? $this->resolveOrCreatePatient($data);
@@ -139,6 +145,42 @@ class BookingService
     }
 
     /**
+     * Validate that a slot is compatible with the flexible planning mode.
+     */
+    private function validateSlotWithFlexiblePlanning(
+        int $practitionerId,
+        Carbon $date,
+        string $startTime,
+        ?int $appointmentTypeId
+    ): void {
+        $blocks = $this->flexiblePlanningService->resolveAvailableBlocks(
+            $practitionerId, $date, $appointmentTypeId
+        );
+
+        if ($blocks->isEmpty()) {
+            throw new \RuntimeException('Aucun créneau disponible pour les critères sélectionnés.');
+        }
+
+        $slotFound = $blocks->contains(function ($block) use ($startTime) {
+            $blockStart = $block['start_time'] instanceof \Carbon\Carbon
+                ? $block['start_time']->format('H:i:s')
+                : (is_string($block['start_time']) ? $block['start_time'] : '');
+            $blockEnd = $block['end_time'] instanceof \Carbon\Carbon
+                ? $block['end_time']->format('H:i:s')
+                : (is_string($block['end_time']) ? $block['end_time'] : '');
+
+            return $startTime >= $blockStart && $startTime < $blockEnd;
+        });
+
+        if (!$slotFound && $appointmentTypeId) {
+            // Vérifier si le praticien peut réaliser cet acte
+            if (!$this->flexiblePlanningService->practitionerCanPerformAct($practitionerId, $appointmentTypeId)) {
+                throw new \RuntimeException('Ce praticien ne peut pas réaliser cet acte.');
+            }
+        }
+    }
+
+    /**
      * Determine the duration of an appointment.
      */
     private function determineDuration(int $practitionerId, Carbon $date, ?int $appointmentTypeId): int
@@ -150,13 +192,17 @@ class BookingService
             }
         }
 
-        // Fallback to planning or default
+        // Fallback to planning (respect planning_mode)
         $planning = \Modules\Appointment\Models\Planning::where('professional_id', $practitionerId)
             ->where('day_of_week', (int) $date->dayOfWeek)
             ->where('is_active', true)
             ->first();
 
-        return $planning?->consultation_minutes ?? config('appointment.default_consultation_minutes', 20);
+        if ($planning) {
+            return $planning->getEffectiveDurationMinutes();
+        }
+
+        return config('appointment.default_consultation_minutes', 20);
     }
 
     /**

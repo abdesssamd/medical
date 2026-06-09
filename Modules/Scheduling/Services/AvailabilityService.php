@@ -14,6 +14,48 @@ use Modules\Scheduling\Models\AppointmentType;
 class AvailabilityService
 {
     /**
+     * V2: utilise FlexiblePlanningService pour résoudre les trois modes.
+     */
+    public function getAvailabilityV2(
+        int $practitionerId,
+        Carbon $date,
+        ?int $appointmentTypeId = null
+    ): array {
+        $flexibleService = app(FlexiblePlanningService::class);
+        $resolvedBlocks = $flexibleService->resolveAvailableBlocks(
+            $practitionerId, $date, $appointmentTypeId
+        );
+
+        if ($resolvedBlocks->isEmpty()) {
+            return [
+                'available' => false,
+                'reason' => 'no_availability_block',
+                'slots' => [],
+                'max_patients_per_day' => null,
+                'booked_count' => 0,
+            ];
+        }
+
+        foreach ($resolvedBlocks as $blockData) {
+            AvailabilityBlock::updateOrCreate(
+                [
+                    'practitioner_id' => $blockData['practitioner_id'],
+                    'date'            => $blockData['date'],
+                    'start_time'      => $blockData['start_time'],
+                    'end_time'        => $blockData['end_time'],
+                    'type'            => 'available',
+                ],
+                [
+                    'room_id'             => $blockData['room_id'] ?? null,
+                    'appointment_type_id' => $blockData['appointment_type_id'] ?? $appointmentTypeId,
+                    'max_patients'        => $blockData['max_patients'] ?? null,
+                ]
+            );
+        }
+
+        return $this->getAvailability($practitionerId, $date, $appointmentTypeId);
+    }
+    /**
      * Get availability for a practitioner on a specific date.
      * Returns available time slots based on availability blocks and existing appointments.
      */

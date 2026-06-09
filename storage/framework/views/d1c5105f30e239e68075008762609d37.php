@@ -50,4 +50,4 @@ unset($__defined_vars, $__key, $__value); ?>
     <?php echo e($slot); ?>
 
 </button>
-<?php /**PATH D:\xampp8.2\htdocs\fils_attente\resources\views/components/tabler-button.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\xamp8.1\htdocs\medical\resources\views/components/tabler-button.blade.php ENDPATH**/ ?>

@@ -656,6 +656,8 @@
             ['label' => 'File d\'attente', 'icon' => 'ti ti-list-numbers', 'route' => 'admin.dashboard', 'active' => 'admin.*'],
             ['label' => 'Paramétrages', 'icon' => 'ti ti-settings-automation', 'submenu' => [
                 ['label' => 'Utilisateurs', 'route' => 'users.index', 'active' => 'users.*'],
+                ['label' => 'Paramétrage des plannings', 'route' => 'admin.planning.settings', 'active' => 'admin.planning.*'],
+                ['label' => 'Borne d\'accueil', 'route' => 'admin.settings', 'active' => 'admin.settings*'],
 				['label' => 'Templates RIS', 'route' => 'ris.templates.index', 'active' => 'ris.templates.*'],
                 ['label' => 'Questionnaires', 'route' => 'clinical.questionnaire-templates.index', 'active' => 'clinical.questionnaire-templates.*'],
                 
@@ -936,4 +938,4 @@
 </script>
 
 </body>
-</html><?php /**PATH D:\xampp8.2\htdocs\fils_attente\resources\views/layouts/admin.blade.php ENDPATH**/ ?>
+</html><?php /**PATH E:\xamp8.1\htdocs\medical\resources\views/layouts/admin.blade.php ENDPATH**/ ?>

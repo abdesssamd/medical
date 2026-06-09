@@ -4,31 +4,19 @@ use App\Http\Controllers\Web\CareSuiteController;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
-
-        if ($user->hasAnyRole(['super_admin', 'admin'])) {
-            return redirect()->route('admin.dashboard');
-        }
-        if ($user->hasAnyRole(['agent'])) {
-            return redirect()->route('agent.dashboard');
-        }
-        if ($user->hasAnyRole(['professional', 'doctor', 'medecin'])) {
-            return redirect()->route('appointment.pro.dashboard');
-        }
-        if ($user->hasAnyRole(['secretary', 'secretaire'])) {
-            $professionalId = \App\Models\User::query()
-                ->whereIn('role', ['professional', 'doctor'])
-                ->value('id') ?? auth()->id();
-            return redirect()->route('appointment.sec.dashboard', ['professional_id' => $professionalId]);
-        }
-
-        return redirect()->route('tickets.create');
-    }
-
-    return redirect()->route('login');
-})->name('home');
+// ===== PUBLIC APPOINTMENT SEARCH =====
+Route::prefix('rendez-vous')->name('public.')->group(function () {
+    Route::get('/', [\Modules\Appointment\Http\Controllers\Public\PublicAppointmentController::class, 'landing'])
+        ->name('appointment.landing');
+    Route::get('/rechercher', [\Modules\Appointment\Http\Controllers\Public\PublicAppointmentController::class, 'searchForm'])
+        ->name('appointment.search');
+    Route::get('/creneaux', [\Modules\Appointment\Http\Controllers\Public\PublicAppointmentController::class, 'getSlotsJson'])
+        ->name('appointment.slots.json');
+    Route::post('/demande', [\Modules\Appointment\Http\Controllers\Public\PublicAppointmentController::class, 'submitRequest'])
+        ->name('appointment.request');
+    Route::get('/confirmation/{token?}', [\Modules\Appointment\Http\Controllers\Public\PublicAppointmentController::class, 'confirmation'])
+        ->name('appointment.confirmation');
+});
 
 Route::get('/tabler/dashboard', function () {
     $stats = [

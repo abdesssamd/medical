@@ -11,7 +11,28 @@ use Modules\Queue\Http\Controllers\AuthController;
 use Modules\Queue\Http\Controllers\TicketController;
 
 Route::middleware('web')->group(function (): void {
-Route::get('/', [TicketController::class, 'create'])->name('home');
+Route::get('/', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->hasAnyRole(['super_admin', 'admin'])) {
+            return redirect()->route('admin.dashboard');
+        }
+        if ($user->hasAnyRole(['agent'])) {
+            return redirect()->route('agent.dashboard');
+        }
+        if ($user->hasAnyRole(['professional', 'doctor', 'medecin'])) {
+            return redirect()->route('appointment.pro.dashboard');
+        }
+        if ($user->hasAnyRole(['secretary', 'secretaire'])) {
+            $professionalId = \App\Models\User::query()
+                ->whereIn('role', ['professional', 'doctor'])
+                ->value('id') ?? auth()->id();
+            return redirect()->route('appointment.sec.dashboard', ['professional_id' => $professionalId]);
+        }
+        return redirect()->route('tickets.create');
+    }
+    return redirect()->route('public.appointment.landing');
+})->name('home');
 
 Route::get('/lang/{locale}', function (string $locale) {
     if (in_array($locale, ['fr', 'ar'], true)) {
@@ -33,6 +54,13 @@ Route::middleware(['auth', EnsureRole::class.':super_admin,admin,professional,do
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
     Route::get('/settings/questionnaires', [CareSuiteController::class, 'questionnaireSettings'])->name('settings.questionnaires');
     Route::post('/settings/questionnaires', [CareSuiteController::class, 'storeQuestionnaireTemplate'])->name('settings.questionnaires.store');
+});
+
+Route::middleware(['auth', EnsureRole::class.':super_admin,admin,secretary'])->prefix('admin/planning-settings')->name('admin.planning.')->group(function (): void {
+    Route::get('/', [\Modules\Appointment\Http\Controllers\Admin\AdminPlanningController::class, 'index'])->name('settings');
+    Route::post('/planning', [\Modules\Appointment\Http\Controllers\Admin\AdminPlanningController::class, 'storePlanning'])->name('store');
+    Route::put('/planning/{planning}', [\Modules\Appointment\Http\Controllers\Admin\AdminPlanningController::class, 'updatePlanning'])->name('update');
+    Route::delete('/planning/{planning}', [\Modules\Appointment\Http\Controllers\Admin\AdminPlanningController::class, 'destroyPlanning'])->name('destroy');
 });
 
 Route::middleware(['auth', EnsureRole::class.':super_admin'])->prefix('admin')->name('admin.')->group(function (): void {
