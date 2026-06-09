@@ -1,9 +1,7 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'RIS Radiologie'); ?>
+<?php $__env->startSection('page-title', 'RIS Radiologie'); ?>
 
-@section('title', 'RIS Radiologie')
-@section('page-title', 'RIS Radiologie')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         :root {
             --ris-accent: #0ea5e9;
@@ -603,7 +601,7 @@
         }
     </style>
 
-    @php
+    <?php
         $selectedInitials = $selectedPatient
             ? \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr((string) $selectedPatient->first_name, 0, 1).\Illuminate\Support\Str::substr((string) $selectedPatient->last_name, 0, 1))
             : 'P';
@@ -615,19 +613,19 @@
             ['key' => 'done', 'label' => 'Termines', 'value' => $stats['done'], 'icon' => 'ti ti-rosette-discount-check'],
             ['key' => 'urgent', 'label' => 'Urgents / STAT', 'value' => $stats['urgent'], 'icon' => 'ti ti-bell-ringing'],
         ];
-    @endphp
+    ?>
 
     <div class="ris26-shell">
-        @if($selectedPatient)
+        <?php if($selectedPatient): ?>
             <div id="module3-patient-context"
                  class="d-none"
-                 data-patient-id="{{ $selectedPatient->id }}"
-                 data-patient-name="{{ $selectedPatient->full_name }}"
-                 data-patient-mrn="{{ $selectedPatient->medical_record_number }}"
-                 data-patient-age="{{ $selectedPatient->age ?? optional($selectedPatient->date_of_birth)->age ?? '-' }}"
-                 data-patient-phone="{{ $selectedPatient->phone ?: '-' }}"
-                 data-patient-release-url="{{ route('ris.patients.clear') }}"></div>
-        @endif
+                 data-patient-id="<?php echo e($selectedPatient->id); ?>"
+                 data-patient-name="<?php echo e($selectedPatient->full_name); ?>"
+                 data-patient-mrn="<?php echo e($selectedPatient->medical_record_number); ?>"
+                 data-patient-age="<?php echo e($selectedPatient->age ?? optional($selectedPatient->date_of_birth)->age ?? '-'); ?>"
+                 data-patient-phone="<?php echo e($selectedPatient->phone ?: '-'); ?>"
+                 data-patient-release-url="<?php echo e(route('ris.patients.clear')); ?>"></div>
+        <?php endif; ?>
 
         <section class="ris26-top">
             <article class="ris26-card ris26-hero">
@@ -637,12 +635,13 @@
                     <p class="ris26-copy">Demandes, PACS , réception d’images et comptes rendus dans un flux unique plus lisible, avec recherche globale et suivi live des statuts.</p>
 
                     <div class="ris26-inline-meta">
-                        <span class="ris26-pill {{ ($orthancStatus['ok'] ?? false) ? 'is-ok' : 'is-bad' }}">
+                        <span class="ris26-pill <?php echo e(($orthancStatus['ok'] ?? false) ? 'is-ok' : 'is-bad'); ?>">
                             <i class="ti ti-activity-heartbeat"></i>
-                            {{ ($orthancStatus['ok'] ?? false) ? 'PACS connecte' : 'PACS indisponible' }}
+                            <?php echo e(($orthancStatus['ok'] ?? false) ? 'PACS connecte' : 'PACS indisponible'); ?>
+
                         </span>
-                        <span class="ris26-pill">{{ $patients->count() }} patients visibles</span>
-                        <span class="ris26-pill">{{ $modalities->count() }} modalites | {{ $procedures->count() }} actes</span>
+                        <span class="ris26-pill"><?php echo e($patients->count()); ?> patients visibles</span>
+                        <span class="ris26-pill"><?php echo e($modalities->count()); ?> modalites | <?php echo e($procedures->count()); ?> actes</span>
                     </div>
                 </div>
             </article>
@@ -651,13 +650,15 @@
                 <article class="ris26-card">
                     <div class="ris26-panel">
                         <div class="ris26-small-title">Etat de la connexion</div>
-                        <div class="ris26-status-title">{{ ($orthancStatus['ok'] ?? false) ? 'PACS pret' : 'Connexion a verifier' }}</div>
+                        <div class="ris26-status-title"><?php echo e(($orthancStatus['ok'] ?? false) ? 'PACS pret' : 'Connexion a verifier'); ?></div>
                         <div class="ris26-status-copy">
-                            @if($orthancStatus['ok'] ?? false)
-                                HTTP {{ $orthancStatus['status'] ?? 200 }} | {{ data_get($orthancStatus, 'data.Name', 'Orthanc') }}
-                            @else
-                                {{ $orthancStatus['message'] ?? 'Verifier la configuration RIS_ORTHANC_*' }}
-                            @endif
+                            <?php if($orthancStatus['ok'] ?? false): ?>
+                                HTTP <?php echo e($orthancStatus['status'] ?? 200); ?> | <?php echo e(data_get($orthancStatus, 'data.Name', 'Orthanc')); ?>
+
+                            <?php else: ?>
+                                <?php echo e($orthancStatus['message'] ?? 'Verifier la configuration RIS_ORTHANC_*'); ?>
+
+                            <?php endif; ?>
                         </div>
                     </div>
                 </article>
@@ -675,45 +676,46 @@
             </div>
         </section>
 
-        @if($selectedPatient)
+        <?php if($selectedPatient): ?>
             <section class="ris26-selected">
                 <div class="ris26-patient">
                     <div class="ris26-avatar">
-                        @if($selectedPatient->patient_photo_path)
-                            <img src="{{ asset($selectedPatient->patient_photo_path) }}" alt="">
-                        @else
-                            {{ $selectedInitials ?: 'P' }}
-                        @endif
+                        <?php if($selectedPatient->patient_photo_path): ?>
+                            <img src="<?php echo e(asset($selectedPatient->patient_photo_path)); ?>" alt="">
+                        <?php else: ?>
+                            <?php echo e($selectedInitials ?: 'P'); ?>
+
+                        <?php endif; ?>
                     </div>
                     <div>
-                        <div class="ris26-patient-name">{{ $selectedPatient->full_name }}</div>
-                        <div class="ris26-patient-meta">{{ $selectedPatient->medical_record_number }} | Ne(e) le {{ optional($selectedPatient->date_of_birth)->format('d/m/Y') ?: '-' }}</div>
+                        <div class="ris26-patient-name"><?php echo e($selectedPatient->full_name); ?></div>
+                        <div class="ris26-patient-meta"><?php echo e($selectedPatient->medical_record_number); ?> | Ne(e) le <?php echo e(optional($selectedPatient->date_of_birth)->format('d/m/Y') ?: '-'); ?></div>
                     </div>
                 </div>
                 <div class="ris26-actions">
-                    <form method="POST" action="{{ route('ris.exams.sync-pacs') }}">
-                        @csrf
-                        <input type="hidden" name="patient_id" value="{{ $selectedPatient->id }}">
+                    <form method="POST" action="<?php echo e(route('ris.exams.sync-pacs')); ?>">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="patient_id" value="<?php echo e($selectedPatient->id); ?>">
                         <button type="submit" class="ris26-btn ris26-btn-soft">Synchroniser avec PACS</button>
                     </form>
-                    <form method="POST" action="{{ route('ris.patients.clear') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('ris.patients.clear')); ?>">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="ris26-btn">Fermer le dossier</button>
                     </form>
                 </div>
             </section>
-        @endif
+        <?php endif; ?>
 
         <section class="ris26-kpis">
-            @foreach($kpis as $kpi)
+            <?php $__currentLoopData = $kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <article class="ris26-kpi">
                     <div class="ris26-kpi-top">
-                        <div class="ris26-kpi-label">{{ $kpi['label'] }}</div>
-                        <div class="ris26-kpi-icon"><i class="{{ $kpi['icon'] }}"></i></div>
+                        <div class="ris26-kpi-label"><?php echo e($kpi['label']); ?></div>
+                        <div class="ris26-kpi-icon"><i class="<?php echo e($kpi['icon']); ?>"></i></div>
                     </div>
-                    <div class="ris26-kpi-value" data-kpi="{{ $kpi['key'] }}">{{ $kpi['value'] }}</div>
+                    <div class="ris26-kpi-value" data-kpi="<?php echo e($kpi['key']); ?>"><?php echo e($kpi['value']); ?></div>
                 </article>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </section>
 
         <section class="ris26-card">
@@ -728,44 +730,44 @@
                 <form method="GET" class="ris26-filters">
                     <div class="ris26-field">
                         <label>Filtre texte</label>
-                        <input type="text" name="search" value="{{ $filters['search'] }}" placeholder="Patient, MRN, accession, acte...">
+                        <input type="text" name="search" value="<?php echo e($filters['search']); ?>" placeholder="Patient, MRN, accession, acte...">
                     </div>
                     <div class="ris26-field">
                         <label>Statut</label>
                         <select name="status">
                             <option value="">Tous</option>
-                            @foreach($statusLabels as $statusValue => $statusLabel)
-                                <option value="{{ $statusValue }}" @selected($filters['status'] === $statusValue)>{{ $statusLabel }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $statusLabels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $statusValue => $statusLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($statusValue); ?>" <?php if($filters['status'] === $statusValue): echo 'selected'; endif; ?>><?php echo e($statusLabel); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="ris26-field">
                         <label>Priorite</label>
                         <select name="priority">
                             <option value="">Toutes</option>
-                            @foreach($priorityLabels as $priorityValue => $priorityLabel)
-                                <option value="{{ $priorityValue }}" @selected($filters['priority'] === $priorityValue)>{{ $priorityLabel }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $priorityLabels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $priorityValue => $priorityLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($priorityValue); ?>" <?php if($filters['priority'] === $priorityValue): echo 'selected'; endif; ?>><?php echo e($priorityLabel); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="ris26-field">
                         <label>Modalite</label>
                         <select name="modality_id">
                             <option value="">Toutes</option>
-                            @foreach($modalities as $modality)
-                                <option value="{{ $modality->id }}" @selected((int) $filters['modality_id'] === (int) $modality->id)>{{ $modality->name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $modalities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modality): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($modality->id); ?>" <?php if((int) $filters['modality_id'] === (int) $modality->id): echo 'selected'; endif; ?>><?php echo e($modality->name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="ris26-field" style="display: flex; align-items: flex-end; padding-bottom: 4px;">
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; text-transform: none; letter-spacing: normal; color: var(--ris-ink); font-weight: 700;">
-                            <input type="checkbox" name="include_orphan" value="1" @checked($filters['include_orphan']) style="width: 18px; height: 18px; border-radius: 6px; accent-color: var(--ris-accent);">
+                            <input type="checkbox" name="include_orphan" value="1" <?php if($filters['include_orphan']): echo 'checked'; endif; ?> style="width: 18px; height: 18px; border-radius: 6px; accent-color: var(--ris-accent);">
                             <span>Inclure les instances <span style="color: var(--ris-accent-deep);">PACS</span> non liees au RIS</span>
                         </label>
                     </div>
                     <div class="ris26-actions" style="align-self: end;">
                         <button type="submit" class="ris26-btn ris26-btn-primary">Filtrer</button>
-                        <a href="{{ route('ris.exams.index') }}" class="ris26-btn">Reset</a>
+                        <a href="<?php echo e(route('ris.exams.index')); ?>" class="ris26-btn">Reset</a>
                     </div>
                 </form>
             </div>
@@ -794,8 +796,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($orders as $order)
-                                    @php
+                                <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <?php
                                         $payload = (array) ($order->orthanc_payload ?? []);
                                         $viewerStudyId = data_get($payload, 'study_uid')
                                             ?? data_get($payload, 'reconciliation.matched_study.study_instance_uid')
@@ -804,93 +806,93 @@
                                         $viewerUrl = $viewerStudyId
                                             ? rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/').'/stone-webviewer/index.html?study='.urlencode((string) $viewerStudyId)
                                             : null;
-                                    @endphp
-                                    <tr class="ris26-row" data-order-row data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
+                                    ?>
+                                    <tr class="ris26-row" data-order-row data-order-id="<?php echo e($order->id); ?>" data-order-status="<?php echo e($order->status); ?>">
                                         <td>
-                                            <div class="ris26-entity-title">{{ $order->accession_number ?: 'RIS-'.$order->id }}</div>
-                                            <div class="ris26-entity-meta">Demande {{ optional($order->requested_at)->format('d/m/Y H:i') }}</div>
+                                            <div class="ris26-entity-title"><?php echo e($order->accession_number ?: 'RIS-'.$order->id); ?></div>
+                                            <div class="ris26-entity-meta">Demande <?php echo e(optional($order->requested_at)->format('d/m/Y H:i')); ?></div>
                                         </td>
                                         <td>
-                                            <div class="ris26-entity-title">{{ $order->patient?->full_name ?? 'Patient inconnu' }}</div>
-                                            <div class="ris26-entity-meta">{{ $order->patient?->medical_record_number }} | {{ $order->patient?->phone }}</div>
+                                            <div class="ris26-entity-title"><?php echo e($order->patient?->full_name ?? 'Patient inconnu'); ?></div>
+                                            <div class="ris26-entity-meta"><?php echo e($order->patient?->medical_record_number); ?> | <?php echo e($order->patient?->phone); ?></div>
                                         </td>
                                         <td>
-                                            <div class="ris26-entity-title">{{ $order->procedure?->label ?? 'Acte non defini' }}</div>
-                                            <div class="ris26-entity-meta">{{ $order->modality?->name ?? 'Modalite non definie' }}</div>
+                                            <div class="ris26-entity-title"><?php echo e($order->procedure?->label ?? 'Acte non defini'); ?></div>
+                                            <div class="ris26-entity-meta"><?php echo e($order->modality?->name ?? 'Modalite non definie'); ?></div>
                                         </td>
                                         <td>
-                                            <div class="ris26-entity-title">{{ optional($order->scheduled_at)->format('d/m/Y H:i') ?: 'Non planifie' }}</div>
-                                            <div class="ris26-entity-meta">{{ $order->requestedBy?->display_name ?? 'Utilisateur non renseigne' }}</div>
+                                            <div class="ris26-entity-title"><?php echo e(optional($order->scheduled_at)->format('d/m/Y H:i') ?: 'Non planifie'); ?></div>
+                                            <div class="ris26-entity-meta"><?php echo e($order->requestedBy?->display_name ?? 'Utilisateur non renseigne'); ?></div>
                                         </td>
                                         <td>
                                             <div class="ris26-actions" style="gap: 8px;">
-                                                <span class="ris26-chip ris26-chip-status-{{ $order->status }}" data-status-chip>{{ $order->status_label }}</span>
-                                                <span class="ris26-chip ris26-chip-priority-{{ $order->priority }}" data-priority-chip>{{ $order->priority_label }}</span>
+                                                <span class="ris26-chip ris26-chip-status-<?php echo e($order->status); ?>" data-status-chip><?php echo e($order->status_label); ?></span>
+                                                <span class="ris26-chip ris26-chip-priority-<?php echo e($order->priority); ?>" data-priority-chip><?php echo e($order->priority_label); ?></span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="ris26-row-actions">
-                                                <a href="{{ route('ris.exams.show', $order) }}" class="ris26-btn ris26-btn-soft">Ouvrir</a>
-                                                @if($viewerUrl)
-                                                    <a href="{{ $viewerUrl }}" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
-                                                @endif
-                                                @if($order->status === \Modules\RIS\Models\RisOrder::STATUS_ORDONNE)
-                                                    <form method="POST" action="{{ route('ris.exams.waiting', $order) }}">
-                                                        @csrf
-                                                        @method('PATCH')
+                                                <a href="<?php echo e(route('ris.exams.show', $order)); ?>" class="ris26-btn ris26-btn-soft">Ouvrir</a>
+                                                <?php if($viewerUrl): ?>
+                                                    <a href="<?php echo e($viewerUrl); ?>" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
+                                                <?php endif; ?>
+                                                <?php if($order->status === \Modules\RIS\Models\RisOrder::STATUS_ORDONNE): ?>
+                                                    <form method="POST" action="<?php echo e(route('ris.exams.waiting', $order)); ?>">
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('PATCH'); ?>
                                                         <button type="submit" class="ris26-btn">Attente</button>
                                                     </form>
-                                                @endif
-                                                @if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE)
-                                                    <form method="POST" action="{{ route('ris.exams.worklist', $order) }}">
-                                                        @csrf
+                                                <?php endif; ?>
+                                                <?php if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE): ?>
+                                                    <form method="POST" action="<?php echo e(route('ris.exams.worklist', $order)); ?>">
+                                                        <?php echo csrf_field(); ?>
                                                         <button type="submit" class="ris26-btn">MWL</button>
                                                     </form>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
-                                @empty
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <tr>
                                         <td colspan="6" class="ris26-empty">Aucun examen RIS ne correspond aux filtres.</td>
                                     </tr>
-                                @endforelse
+                                <?php endif; ?>
 
-                                @if($orphanStudies->isNotEmpty())
+                                <?php if($orphanStudies->isNotEmpty()): ?>
                                     <tr>
                                         <td colspan="6" style="padding: 20px 14px 6px;">
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
                                                 <span style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; font-weight: 800;">
-                                                    Études PACS orphelines (non liées au RIS) — {{ $orphanStudies->count() }} trouvée(s)
+                                                    Études PACS orphelines (non liées au RIS) — <?php echo e($orphanStudies->count()); ?> trouvée(s)
                                                 </span>
                                             </div>
                                         </td>
                                     </tr>
-                                    @php
+                                    <?php
                                         $orthancViewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/');
-                                    @endphp
-                                    @foreach($orphanStudies as $study)
-                                        @php
+                                    ?>
+                                    <?php $__currentLoopData = $orphanStudies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $study): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
                                             $studyViewerUrl = $study->study_uid
                                                 ? $orthancViewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode($study->study_uid)
                                                 : null;
                                             $studyDate = $study->study_date && strlen($study->study_date) >= 8
                                                 ? substr($study->study_date, 0, 4).'/'.substr($study->study_date, 4, 2).'/'.substr($study->study_date, 6, 2)
                                                 : ($study->study_date ?: 'Date inconnue');
-                                        @endphp
+                                        ?>
                                         <tr class="ris26-row" style="background: rgba(255, 247, 237, 0.6);">
                                             <td>
-                                                <div class="ris26-entity-title">{{ $study->accession_number ?: 'PACS-'.$study->orthanc_study_id }}</div>
-                                                <div class="ris26-entity-meta">Étude du {{ $studyDate }}</div>
+                                                <div class="ris26-entity-title"><?php echo e($study->accession_number ?: 'PACS-'.$study->orthanc_study_id); ?></div>
+                                                <div class="ris26-entity-meta">Étude du <?php echo e($studyDate); ?></div>
                                             </td>
                                             <td>
-                                                <div class="ris26-entity-title">{{ $study->patient_name ?: 'Patient inconnu' }}</div>
-                                                <div class="ris26-entity-meta">{{ $study->patient_id }}</div>
+                                                <div class="ris26-entity-title"><?php echo e($study->patient_name ?: 'Patient inconnu'); ?></div>
+                                                <div class="ris26-entity-meta"><?php echo e($study->patient_id); ?></div>
                                             </td>
                                             <td>
-                                                <div class="ris26-entity-title">{{ $study->study_description ?: 'Description non renseignee' }}</div>
-                                                <div class="ris26-entity-meta">{{ $study->modality ?: 'Modalite inconnue' }}</div>
+                                                <div class="ris26-entity-title"><?php echo e($study->study_description ?: 'Description non renseignee'); ?></div>
+                                                <div class="ris26-entity-meta"><?php echo e($study->modality ?: 'Modalite inconnue'); ?></div>
                                             </td>
                                             <td>
                                                 <div class="ris26-entity-title" style="color: #92400e;">Non lie au RIS</div>
@@ -904,19 +906,20 @@
                                             </td>
                                             <td>
                                                 <div class="ris26-row-actions">
-                                                    @if($studyViewerUrl)
-                                                        <a href="{{ $studyViewerUrl }}" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
-                                                    @endif
+                                                    <?php if($studyViewerUrl): ?>
+                                                        <a href="<?php echo e($studyViewerUrl); ?>" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
-                                @endif
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
 
-                    {{ $orders->links() }}
+                    <?php echo e($orders->links()); ?>
+
                 </div>
             </section>
 
@@ -926,28 +929,30 @@
                     <div class="ris26-entity-meta" style="margin-bottom: 14px;">Vue condensée des dernières validations, utile pour reprendre un diagnostic vite.</div>
 
                     <div class="ris26-reports">
-                        @forelse($recentReports as $report)
+                        <?php $__empty_1 = true; $__currentLoopData = $recentReports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $report): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <article class="ris26-report-item">
                                 <div class="ris26-toolbar">
                                     <div>
-                                        <div class="ris26-entity-title">{{ $report->order?->patient?->full_name ?? 'Patient' }}</div>
-                                        <div class="ris26-entity-meta">{{ $report->order?->procedure?->label ?? 'Acte RIS' }}</div>
+                                        <div class="ris26-entity-title"><?php echo e($report->order?->patient?->full_name ?? 'Patient'); ?></div>
+                                        <div class="ris26-entity-meta"><?php echo e($report->order?->procedure?->label ?? 'Acte RIS'); ?></div>
                                     </div>
-                                    @if($report->order)
-                                        <a href="{{ route('ris.exams.show', $report->order) }}" class="ris26-btn ris26-btn-soft">Ouvrir</a>
-                                    @endif
+                                    <?php if($report->order): ?>
+                                        <a href="<?php echo e(route('ris.exams.show', $report->order)); ?>" class="ris26-btn ris26-btn-soft">Ouvrir</a>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="ris26-entity-meta" style="margin-top: 10px;">{{ \Illuminate\Support\Str::limit(strip_tags($report->content), 150) }}</div>
+                                <div class="ris26-entity-meta" style="margin-top: 10px;"><?php echo e(\Illuminate\Support\Str::limit(strip_tags($report->content), 150)); ?></div>
                                 <div class="ris26-entity-meta" style="margin-top: 10px;">
-                                    Valide le {{ optional($report->validated_at)->format('d/m/Y H:i') }}
-                                    @if($report->signingPhysician)
-                                        | {{ $report->signingPhysician->display_name }}
-                                    @endif
+                                    Valide le <?php echo e(optional($report->validated_at)->format('d/m/Y H:i')); ?>
+
+                                    <?php if($report->signingPhysician): ?>
+                                        | <?php echo e($report->signingPhysician->display_name); ?>
+
+                                    <?php endif; ?>
                                 </div>
                             </article>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <div class="ris26-empty">Aucun compte rendu signe pour le moment.</div>
-                        @endforelse
+                        <?php endif; ?>
                     </div>
                 </div>
             </aside>
@@ -978,29 +983,30 @@
                 <button type="button" class="ris26-btn" data-close-slide>Fermer</button>
             </div>
             <div class="ris26-slide-body">
-                <form method="POST" action="{{ route('ris.exams.store') }}" class="ris26-form-grid">
-                    @csrf
-                    @if($selectedPatient)
-                        <input type="hidden" name="patient_id" value="{{ $selectedPatient->id }}">
+                <form method="POST" action="<?php echo e(route('ris.exams.store')); ?>" class="ris26-form-grid">
+                    <?php echo csrf_field(); ?>
+                    <?php if($selectedPatient): ?>
+                        <input type="hidden" name="patient_id" value="<?php echo e($selectedPatient->id); ?>">
                         <div class="full ris26-field">
                             <label>Patient</label>
                             <div class="ris26-selected" style="margin-top: 0;">
                                 <div class="ris26-patient">
                                     <div class="ris26-avatar">
-                                        @if($selectedPatient->patient_photo_path)
-                                            <img src="{{ asset($selectedPatient->patient_photo_path) }}" alt="">
-                                        @else
-                                            {{ $selectedInitials ?: 'P' }}
-                                        @endif
+                                        <?php if($selectedPatient->patient_photo_path): ?>
+                                            <img src="<?php echo e(asset($selectedPatient->patient_photo_path)); ?>" alt="">
+                                        <?php else: ?>
+                                            <?php echo e($selectedInitials ?: 'P'); ?>
+
+                                        <?php endif; ?>
                                     </div>
                                     <div>
-                                        <div class="ris26-patient-name">{{ $selectedPatient->full_name }}</div>
-                                        <div class="ris26-patient-meta">{{ $selectedPatient->medical_record_number }} | Patient verrouillé par le dossier actif</div>
+                                        <div class="ris26-patient-name"><?php echo e($selectedPatient->full_name); ?></div>
+                                        <div class="ris26-patient-meta"><?php echo e($selectedPatient->medical_record_number); ?> | Patient verrouillé par le dossier actif</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="full ris26-field">
                             <label>Patient</label>
                             <div id="ris26PatientPicker" style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
@@ -1056,15 +1062,15 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="ris26-field">
                         <label>Acte RIS</label>
                         <select name="procedure_id" required>
                             <option value="">Choisir</option>
-                            @foreach($procedures as $procedure)
-                                <option value="{{ $procedure->id }}" @selected((int) old('procedure_id') === (int) $procedure->id)>{{ $procedure->label }} | {{ number_format((float) $procedure->price, 2, ',', ' ') }} MAD</option>
-                            @endforeach
+                            <?php $__currentLoopData = $procedures; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $procedure): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($procedure->id); ?>" <?php if((int) old('procedure_id') === (int) $procedure->id): echo 'selected'; endif; ?>><?php echo e($procedure->label); ?> | <?php echo e(number_format((float) $procedure->price, 2, ',', ' ')); ?> MAD</option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
@@ -1072,18 +1078,18 @@
                         <label>Modalite</label>
                         <select name="modality_id" required>
                             <option value="">Choisir</option>
-                            @foreach($modalities as $modality)
-                                <option value="{{ $modality->id }}" @selected((int) old('modality_id') === (int) $modality->id)>{{ $modality->name }} | {{ strtoupper($modality->ae_title) }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $modalities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modality): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($modality->id); ?>" <?php if((int) old('modality_id') === (int) $modality->id): echo 'selected'; endif; ?>><?php echo e($modality->name); ?> | <?php echo e(strtoupper($modality->ae_title)); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
                     <div class="ris26-field">
                         <label>Priorite</label>
                         <select name="priority" required>
-                            @foreach($priorityLabels as $priorityValue => $priorityLabel)
-                                <option value="{{ $priorityValue }}" @selected(old('priority', \Modules\RIS\Models\RisOrder::PRIORITY_ROUTINE) === $priorityValue)>{{ $priorityLabel }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $priorityLabels; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $priorityValue => $priorityLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($priorityValue); ?>" <?php if(old('priority', \Modules\RIS\Models\RisOrder::PRIORITY_ROUTINE) === $priorityValue): echo 'selected'; endif; ?>><?php echo e($priorityLabel); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
@@ -1091,30 +1097,30 @@
                         <label>Demandeur</label>
                         <select name="requested_by_user_id">
                             <option value="">Utilisateur connecte</option>
-                            @foreach($requesters as $requester)
-                                <option value="{{ $requester->id }}" @selected((int) old('requested_by_user_id') === (int) $requester->id)>{{ $requester->display_name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $requesters; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $requester): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($requester->id); ?>" <?php if((int) old('requested_by_user_id') === (int) $requester->id): echo 'selected'; endif; ?>><?php echo e($requester->display_name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
                     <div class="ris26-field">
                         <label>Date demande</label>
-                        <input type="datetime-local" name="requested_at" value="{{ old('requested_at', now()->format('Y-m-d\TH:i')) }}">
+                        <input type="datetime-local" name="requested_at" value="<?php echo e(old('requested_at', now()->format('Y-m-d\TH:i'))); ?>">
                     </div>
 
                     <div class="ris26-field">
                         <label>Date planifiee</label>
-                        <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at') }}">
+                        <input type="datetime-local" name="scheduled_at" value="<?php echo e(old('scheduled_at')); ?>">
                     </div>
 
                     <div class="full ris26-field">
                         <label>Indication clinique</label>
-                        <textarea name="clinical_indication" rows="5" placeholder="Douleur, contrôle, suspicion apicale, bilan implantaire...">{{ old('clinical_indication') }}</textarea>
+                        <textarea name="clinical_indication" rows="5" placeholder="Douleur, contrôle, suspicion apicale, bilan implantaire..."><?php echo e(old('clinical_indication')); ?></textarea>
                     </div>
 
                     <div class="full ris26-actions" style="justify-content: space-between;">
                         <label class="ris26-entity-meta" style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" name="sync_to_orthanc" value="1" @checked(old('sync_to_orthanc', true))>
+                            <input type="checkbox" name="sync_to_orthanc" value="1" <?php if(old('sync_to_orthanc', true)): echo 'checked'; endif; ?>>
                             Envoyer aussi vers la Modality Worklist Orthanc
                         </label>
                         <button type="submit" class="ris26-btn ris26-btn-primary">Créer l’examen RIS</button>
@@ -1243,7 +1249,7 @@
             };
 
             const selectPatient = async (patientId) => {
-                const response = await fetch('{{ route('ris.patients.select') }}', {
+                const response = await fetch('<?php echo e(route('ris.patients.select')); ?>', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -1254,7 +1260,7 @@
                 });
 
                 const payload = await response.json();
-                window.location.href = payload.redirect || '{{ route('ris.exams.index') }}';
+                window.location.href = payload.redirect || '<?php echo e(route('ris.exams.index')); ?>';
             };
 
             const runSpotlightSearch = async () => {
@@ -1269,7 +1275,7 @@
                 }
 
                 spotlightController = new AbortController();
-                const response = await fetch(`{{ route('ris.spotlight') }}?q=${encodeURIComponent(q)}`, {
+                const response = await fetch(`<?php echo e(route('ris.spotlight')); ?>?q=${encodeURIComponent(q)}`, {
                     headers: { 'Accept': 'application/json' },
                     signal: spotlightController.signal,
                 });
@@ -1318,7 +1324,7 @@
                 }
 
                 const ids = orderRows.map((row) => row.dataset.orderId);
-                const url = new URL('{{ route('ris.exams.live') }}', window.location.origin);
+                const url = new URL('<?php echo e(route('ris.exams.live')); ?>', window.location.origin);
                 ids.forEach((id) => url.searchParams.append('ids[]', id));
 
                 try {
@@ -1438,7 +1444,7 @@
                 }
                 searchTimer = setTimeout(async () => {
                     try {
-                        const res = await fetch(`{{ route('ris.patients.search') }}?q=${encodeURIComponent(q)}`, {
+                        const res = await fetch(`<?php echo e(route('ris.patients.search')); ?>?q=${encodeURIComponent(q)}`, {
                             headers: { 'Accept': 'application/json' }
                         });
                         const data = await res.json();
@@ -1512,7 +1518,7 @@
                 saveNewBtn.textContent = 'Creation...';
 
                 try {
-                    const res = await fetch('{{ route('ris.patients.create') }}', {
+                    const res = await fetch('<?php echo e(route('ris.patients.create')); ?>', {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -1537,4 +1543,6 @@
             });
         })();
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp8.2\htdocs\fils_attente\Modules\RIS\Providers/../Resources/views/exams/index.blade.php ENDPATH**/ ?>

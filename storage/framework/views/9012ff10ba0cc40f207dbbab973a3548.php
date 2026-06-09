@@ -1,9 +1,9 @@
-@extends('layouts.admin')
 
-@section('title', 'Examen RIS')
-@section('page-title', 'Fiche examen RIS')
 
-@php
+<?php $__env->startSection('title', 'Examen RIS'); ?>
+<?php $__env->startSection('page-title', 'Fiche examen RIS'); ?>
+
+<?php
     $statusPillClass = match ($order->status) {
         \Modules\RIS\Models\RisOrder::STATUS_ORDONNE => 'risx-pill-status-ordonne',
         \Modules\RIS\Models\RisOrder::STATUS_EN_ATTENTE => 'risx-pill-status-en_attente',
@@ -41,96 +41,96 @@
     ];
 
     $reportEditorInitialHtml = old('report_text', $order->report?->content ?? '');
-@endphp
+?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="risx-page">
-    @if($errors->any())
+    <?php if($errors->any()): ?>
         <div class="risx-alert risx-alert-danger">
-            @foreach($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
+            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div><?php echo e($error); ?></div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @foreach(['success', 'warning', 'error'] as $flashType)
-        @if(session($flashType))
-            <div class="risx-alert risx-alert-{{ $flashType }}">{{ session($flashType) }}</div>
-        @endif
-    @endforeach
+    <?php $__currentLoopData = ['success', 'warning', 'error']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $flashType): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php if(session($flashType)): ?>
+            <div class="risx-alert risx-alert-<?php echo e($flashType); ?>"><?php echo e(session($flashType)); ?></div>
+        <?php endif; ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     <div class="risx-workbench">
         <aside class="risx-sidebar">
             <section class="risx-card risx-side-card">
                 <div class="risx-patient-head">
-                    <h3>{{ $order->patient?->full_name ?? 'Patient' }}</h3>
-                    <div class="risx-side-meta"><strong>MRN</strong> {{ $order->patient?->medical_record_number ?? '-' }}</div>
-                    <div class="risx-side-meta"><strong>Telephone:</strong> {{ $order->patient?->phone ?? '-' }}</div>
-                    <div class="risx-side-meta"><strong>Modalite:</strong> {{ $order->modality?->name ?? '-' }}</div>
-                    <div class="risx-side-meta"><strong>Planning:</strong> {{ optional($order->scheduled_at)->format('d/m/Y H:i') ?: 'Non planifie' }}</div>
-                    <div class="risx-side-meta"><strong>Demandeur:</strong> {{ $order->requestedBy?->name ?? '-' }}</div>
+                    <h3><?php echo e($order->patient?->full_name ?? 'Patient'); ?></h3>
+                    <div class="risx-side-meta"><strong>MRN</strong> <?php echo e($order->patient?->medical_record_number ?? '-'); ?></div>
+                    <div class="risx-side-meta"><strong>Telephone:</strong> <?php echo e($order->patient?->phone ?? '-'); ?></div>
+                    <div class="risx-side-meta"><strong>Modalite:</strong> <?php echo e($order->modality?->name ?? '-'); ?></div>
+                    <div class="risx-side-meta"><strong>Planning:</strong> <?php echo e(optional($order->scheduled_at)->format('d/m/Y H:i') ?: 'Non planifie'); ?></div>
+                    <div class="risx-side-meta"><strong>Demandeur:</strong> <?php echo e($order->requestedBy?->name ?? '-'); ?></div>
                 </div>
 
-                @if($order->patient_id)
-                    <a href="{{ route('clinical.patient.show', $order->patient_id) }}" class="risx-btn risx-btn-wide">Ouvrir dossier clinique</a>
-                @else
+                <?php if($order->patient_id): ?>
+                    <a href="<?php echo e(route('clinical.patient.show', $order->patient_id)); ?>" class="risx-btn risx-btn-wide">Ouvrir dossier clinique</a>
+                <?php else: ?>
                     <button type="button" class="risx-btn risx-btn-wide" disabled>Ouvrir dossier clinique</button>
-                @endif
+                <?php endif; ?>
 
                 <div class="risx-side-divider"></div>
 
                 <h4>Historique patient</h4>
-                @forelse($patientHistory ?? [] as $historyOrder)
-                    <a href="{{ route('ris.exams.show', $historyOrder) }}" class="risx-history-item">
-                        <strong>{{ $historyOrder->procedure?->label ?? 'Examen RIS' }}</strong>
-                        <span>{{ optional($historyOrder->requested_at)->format('d/m/Y') }} - {{ $historyOrder->status_label }}</span>
+                <?php $__empty_1 = true; $__currentLoopData = $patientHistory ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $historyOrder): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <a href="<?php echo e(route('ris.exams.show', $historyOrder)); ?>" class="risx-history-item">
+                        <strong><?php echo e($historyOrder->procedure?->label ?? 'Examen RIS'); ?></strong>
+                        <span><?php echo e(optional($historyOrder->requested_at)->format('d/m/Y')); ?> - <?php echo e($historyOrder->status_label); ?></span>
                     </a>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <p class="risx-muted">Aucun antecedent RIS pour ce patient.</p>
-                @endforelse
+                <?php endif; ?>
             </section>
 
             <section class="risx-card risx-side-card">
                 <h4>Timeline workflow</h4>
                 <div class="risx-timeline">
-                    @foreach($timelineSteps as $step)
-                        <div class="risx-timeline-item {{ $step['done'] ? 'is-done' : '' }}">
+                    <?php $__currentLoopData = $timelineSteps; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $step): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="risx-timeline-item <?php echo e($step['done'] ? 'is-done' : ''); ?>">
                             <span class="risx-timeline-dot"></span>
                             <div>
-                                <strong>{{ $step['label'] }}</strong>
-                                <span>{{ $step['value'] }}</span>
+                                <strong><?php echo e($step['label']); ?></strong>
+                                <span><?php echo e($step['value']); ?></span>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </section>
 
             <section class="risx-card risx-side-card">
                 <h4>Actions</h4>
-                <form method="POST" action="{{ route('ris.exams.waiting', $order) }}">
-                    @csrf
-                    @method('PATCH')
+                <form method="POST" action="<?php echo e(route('ris.exams.waiting', $order)); ?>">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
                     <button class="risx-btn risx-btn-wide risx-btn-warning" type="submit">Passer en attente</button>
                 </form>
-                <form method="POST" action="{{ route('ris.exams.images-received', $order) }}">
-                    @csrf
-                    @method('PATCH')
+                <form method="POST" action="<?php echo e(route('ris.exams.images-received', $order)); ?>">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
                     <button class="risx-btn risx-btn-wide risx-btn-info" type="submit">Marquer images recues</button>
                 </form>
-                @if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE)
-                    <form method="POST" action="{{ route('ris.exams.complete', $order) }}">
-                        @csrf
-                        @method('PATCH')
+                <?php if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE): ?>
+                    <form method="POST" action="<?php echo e(route('ris.exams.complete', $order)); ?>">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
                         <button class="risx-btn risx-btn-wide risx-btn-success" type="submit">Terminer & cloturer</button>
                     </form>
-                @endif
-                <form method="POST" action="{{ route('ris.exams.worklist', $order) }}">
-                    @csrf
+                <?php endif; ?>
+                <form method="POST" action="<?php echo e(route('ris.exams.worklist', $order)); ?>">
+                    <?php echo csrf_field(); ?>
                     <button class="risx-btn risx-btn-wide" type="submit">Synchroniser</button>
                 </form>
-                <form method="POST" action="{{ route('ris.exams.cancel', $order) }}">
-                    @csrf
-                    @method('PATCH')
+                <form method="POST" action="<?php echo e(route('ris.exams.cancel', $order)); ?>">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
                     <label>Motif d'annulation</label>
                     <input class="risx-input" name="cancelled_reason" placeholder="Patient absent, doublon...">
                     <button class="risx-btn risx-btn-danger" type="submit">Annuler</button>
@@ -142,11 +142,11 @@
             <section class="risx-card">
                 <div class="risx-header">
                     <div>
-                        <h3>{{ $order->patient?->full_name ?? 'Patient' }}</h3>
-                        <div class="risx-chip-row">Statut: <span class="{{ $statusPillClass }}">{{ $order->status_label }}</span></div>
+                        <h3><?php echo e($order->patient?->full_name ?? 'Patient'); ?></h3>
+                        <div class="risx-chip-row">Statut: <span class="<?php echo e($statusPillClass); ?>"><?php echo e($order->status_label); ?></span></div>
                     </div>
                     <div class="risx-chip-row">
-                        <a href="{{ route('ris.exams.index') }}" class="risx-btn">Retour</a>
+                        <a href="<?php echo e(route('ris.exams.index')); ?>" class="risx-btn">Retour</a>
                     </div>
                 </div>
 
@@ -157,9 +157,9 @@
                                 <label>TEMPLATE</label>
                                 <select id="report_template_id" name="report_template_id" class="risx-select">
                                     <option value="">-- Aucun --</option>
-                                    @foreach($reportTemplates ?? [] as $tpl)
-                                        <option value="{{ $tpl->id }}" data-template-content="{{ e($tpl->content) }}">{{ $tpl->title }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $reportTemplates ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tpl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($tpl->id); ?>" data-template-content="<?php echo e(e($tpl->content)); ?>"><?php echo e($tpl->title); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
 
@@ -181,9 +181,9 @@
                     </div>
 
                     <div class="risx-col-9">
-                        <form id="ris-report-form" method="POST" action="{{ route('ris.exams.report', $order) }}">
-                            @csrf
-                            @method('PUT')
+                        <form id="ris-report-form" method="POST" action="<?php echo e(route('ris.exams.report', $order)); ?>">
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('PUT'); ?>
 
                             <div class="risx-editor-shell risx-card">
                                 <div class="risx-editor-toolbar">
@@ -201,7 +201,7 @@
                                     <button type="button" data-editor-command="undo" class="risx-btn" title="Annuler"><i class="ti ti-arrow-back-up"></i></button>
                                     <button type="button" data-editor-command="redo" class="risx-btn" title="Refaire"><i class="ti ti-arrow-forward-up"></i></button>
                                     <span class="risx-sep"></span>
-                                    <select id="editorBlockFormat" class="risx-select risx-select-inline" @disabled($isLocked)>
+                                    <select id="editorBlockFormat" class="risx-select risx-select-inline" <?php if($isLocked): echo 'disabled'; endif; ?>>
                                         <option value="">Style</option>
                                         <option value="p">Paragraphe</option>
                                         <option value="h2">Titre</option>
@@ -210,31 +210,31 @@
                                     <button type="button" data-editor-snippet="normal" class="risx-btn" title="Snippet"><i class="ti ti-code-plus"></i></button>
                                     <span class="risx-sep"></span>
                                     <div style="margin-left:auto; display:flex; gap:6px;">
-                                        <button type="button" id="wordTemplateImportButton" class="risx-btn" @disabled($isLocked) title="Charger modèle Word"><i class="ti ti-file-import"></i></button>
+                                        <button type="button" id="wordTemplateImportButton" class="risx-btn" <?php if($isLocked): echo 'disabled'; endif; ?> title="Charger modèle Word"><i class="ti ti-file-import"></i></button>
                                         <button type="button" id="wordExportButton" class="risx-btn" title="Exporter .docx"><i class="ti ti-file-export"></i></button>
                                         <button type="button" id="editorFullscreenButton" class="risx-btn" title="Plein écran"><i class="ti ti-maximize"></i></button>
-                                        <button type="button" id="voiceDictationButton" class="risx-btn" @disabled($isLocked) title="Dictee"><i class="ti ti-microphone"></i></button>
-                                        <button type="button" id="aiAssistButton" data-ai-url="{{ route('ris.exams.ai.analyze', $order) }}" class="risx-btn risx-btn-ai" @disabled($isLocked) title="Analyser IA"><i class="ti ti-stars"></i></button>
+                                        <button type="button" id="voiceDictationButton" class="risx-btn" <?php if($isLocked): echo 'disabled'; endif; ?> title="Dictee"><i class="ti ti-microphone"></i></button>
+                                        <button type="button" id="aiAssistButton" data-ai-url="<?php echo e(route('ris.exams.ai.analyze', $order)); ?>" class="risx-btn risx-btn-ai" <?php if($isLocked): echo 'disabled'; endif; ?> title="Analyser IA"><i class="ti ti-stars"></i></button>
                                     </div>
                                 </div>
 
-                                <div class="risx-editor" id="report_editor" contenteditable="{{ $isLocked ? 'false' : 'true' }}">{!! $reportEditorInitialHtml !!}</div>
-                                <textarea id="report_text" name="report_text" hidden>{{ old('report_text', $order->report?->content) }}</textarea>
+                                <div class="risx-editor" id="report_editor" contenteditable="<?php echo e($isLocked ? 'false' : 'true'); ?>"><?php echo $reportEditorInitialHtml; ?></div>
+                                <textarea id="report_text" name="report_text" hidden><?php echo e(old('report_text', $order->report?->content)); ?></textarea>
                                 <input id="word_template_input" type="file" accept=".docx" hidden>
                             </div>
 
                             <div class="risx-floating-actions">
-                                @unless($isLocked)
+                                <?php if (! ($isLocked)): ?>
                                     <button type="submit" class="risx-btn risx-btn-primary">Enregistrer</button>
-                                @endunless
+                                <?php endif; ?>
 
-                                @if($order->report)
-                                    <a href="{{ route('ris.exams.report.pdf', $order) }}" class="risx-btn">Aperçu PDF</a>
-                                    <button type="submit" formaction="{{ route('ris.exams.send-report', $order) }}" formmethod="POST" formnovalidate class="risx-btn">Envoyer</button>
-                                @else
+                                <?php if($order->report): ?>
+                                    <a href="<?php echo e(route('ris.exams.report.pdf', $order)); ?>" class="risx-btn">Aperçu PDF</a>
+                                    <button type="submit" formaction="<?php echo e(route('ris.exams.send-report', $order)); ?>" formmethod="POST" formnovalidate class="risx-btn">Envoyer</button>
+                                <?php else: ?>
                                     <button type="button" class="risx-btn" disabled>Aperçu PDF</button>
                                     <button type="button" class="risx-btn" disabled>Envoyer</button>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>
@@ -243,11 +243,11 @@
 
             <section class="risx-card risx-viewer-box">
                 <div id="orthancViewerFrameContainer">
-                    @if($viewerUrl)
-                        <iframe src="{{ $viewerUrl }}" frameborder="0"></iframe>
-                    @else
+                    <?php if($viewerUrl): ?>
+                        <iframe src="<?php echo e($viewerUrl); ?>" frameborder="0"></iframe>
+                    <?php else: ?>
                         <div style="padding:24px;">Aucun viewer disponible.</div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </section>
         </main>
@@ -359,7 +359,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const canEdit = {{ $isLocked ? 'false' : 'true' }};
+        const canEdit = <?php echo e($isLocked ? 'false' : 'true'); ?>;
         const templateSelect = document.getElementById('report_template_id');
         const insertFieldSelect = document.getElementById('report_insert_field');
         const reportTextarea = document.getElementById('report_text');
@@ -377,10 +377,10 @@
         const editorButtons = document.querySelectorAll('[data-editor-command], [data-editor-snippet]');
 
         const risPatient = {
-            full_name: @json($order->patient?->full_name ?? ''),
-            age: @json(optional($order->patient)->age ?? ''),
-            modality: @json($order->modality?->name ?? ''),
-            scheduled_at: @json(optional($order->scheduled_at)->format('d/m/Y H:i') ?? ''),
+            full_name: <?php echo json_encode($order->patient?->full_name ?? '', 15, 512) ?>,
+            age: <?php echo json_encode(optional($order->patient)->age ?? '', 15, 512) ?>,
+            modality: <?php echo json_encode($order->modality?->name ?? '', 15, 512) ?>,
+            scheduled_at: <?php echo json_encode(optional($order->scheduled_at)->format('d/m/Y H:i') ?? '', 15, 512) ?>,
         };
 
         let savedRange = null;
@@ -627,7 +627,7 @@
 
                 const wrappedHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`;
                 const blob = window.htmlDocx.asBlob(wrappedHtml);
-                window.saveAs(blob, `rapport-ris-{{ $order->id }}.docx`);
+                window.saveAs(blob, `rapport-ris-<?php echo e($order->id); ?>.docx`);
             } catch (error) {
                 alert('Export Word impossible pour le moment.');
             }
@@ -701,9 +701,10 @@
         });
 
         templateManagerButton?.addEventListener('click', () => {
-            window.location.href = @json(route('ris.templates.index'));
+            window.location.href = <?php echo json_encode(route('ris.templates.index'), 15, 512) ?>;
         });
     });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp8.2\htdocs\fils_attente\Modules\RIS\Providers/../Resources/views/exams/show.blade.php ENDPATH**/ ?>

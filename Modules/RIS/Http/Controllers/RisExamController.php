@@ -460,6 +460,46 @@ class RisExamController extends Controller
             ->with('success', 'Examen RIS cree avec succes.');
     }
 
+    public function createPatientJson(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:191'],
+            'last_name' => ['required', 'string', 'max:191'],
+            'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
+            'gender' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'cin' => ['nullable', 'string', 'max:60'],
+        ]);
+
+        try {
+            $patient = DB::transaction(function () use ($validated): Patient {
+                return Patient::query()->create([
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'date_of_birth' => $validated['date_of_birth'],
+                    'gender' => $validated['gender'] ?? null,
+                    'phone' => $validated['phone'] ?? null,
+                    'cin' => $validated['cin'] ?? null,
+                    'is_active' => true,
+                ]);
+            });
+
+            return response()->json([
+                'ok' => true,
+                'patient' => [
+                    'id' => $patient->id,
+                    'full_name' => $patient->full_name,
+                    'medical_record_number' => $patient->medical_record_number,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
     public function syncSelectedPatientWithOrthanc(Request $request, OrthancService $orthancService): RedirectResponse
     {
         $patientId = (int) ($request->input('patient_id') ?: $request->session()->get('ris.selected_patient_id', 0));

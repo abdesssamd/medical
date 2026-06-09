@@ -18,6 +18,7 @@ Route::middleware(['web', 'auth', EnsureRisIsEnabled::class])
         Route::get('/examens/live', [RisExamController::class, 'liveSnapshot'])->name('exams.live');
         Route::post('/patients/select', [RisExamController::class, 'selectPatient'])->name('patients.select');
         Route::post('/patients/clear', [RisExamController::class, 'clearPatient'])->name('patients.clear');
+        Route::post('/patients/create', [RisExamController::class, 'createPatientJson'])->name('patients.create');
         Route::get('/examens/{order}', [RisExamController::class, 'show'])->name('exams.show');
         Route::get('/examens/{order}/previous-report', [RisExamController::class, 'previousReport'])->name('exams.previous-report');
         Route::patch('/examens/{order}/attente', [RisExamController::class, 'markAsWaiting'])->name('exams.waiting');

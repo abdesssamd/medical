@@ -1,9 +1,9 @@
-@extends('layouts.admin')
 
-@section('title', 'Templates RIS')
-@section('page-title', 'Gestionnaire de templates RIS')
 
-@section('content')
+<?php $__env->startSection('title', 'Templates RIS'); ?>
+<?php $__env->startSection('page-title', 'Gestionnaire de templates RIS'); ?>
+
+<?php $__env->startSection('content'); ?>
 <style>
     .template-page { display: grid; gap: 18px; color: #0f172a; }
     .template-hero { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 18px; border: 1px solid #dbe8f3; border-radius: 18px; background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%); box-shadow: 0 18px 40px rgba(15,23,42,0.06); }
@@ -47,19 +47,19 @@
 </style>
 
 <div class="template-page">
-    @if(session('success'))
-        <div class="template-warning" style="background:#dcfce7; border-color:#86efac; color:#166534;">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="template-warning" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">{{ session('error') }}</div>
-    @endif
+    <?php if(session('success')): ?>
+        <div class="template-warning" style="background:#dcfce7; border-color:#86efac; color:#166534;"><?php echo e(session('success')); ?></div>
+    <?php endif; ?>
+    <?php if(session('error')): ?>
+        <div class="template-warning" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;"><?php echo e(session('error')); ?></div>
+    <?php endif; ?>
 
     <section class="template-hero">
         <div>
             <h2>Gestionnaire de templates</h2>
             <p>Créer, classer, modifier ou supprimer les modèles de compte-rendu avec un éditeur enrichi identique à la fiche examen.</p>
         </div>
-        <a href="{{ route('ris.exams.index') }}" class="template-link">Retour aux examens</a>
+        <a href="<?php echo e(route('ris.exams.index')); ?>" class="template-link">Retour aux examens</a>
     </section>
 
     <div class="template-grid">
@@ -73,27 +73,27 @@
                 </div>
 
                 <div class="template-list">
-                    @forelse($templates as $template)
+                    <?php $__empty_1 = true; $__currentLoopData = $templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <article class="template-item">
                             <div class="template-item-head">
                                 <div>
-                                    <div style="font-weight:800; font-size:16px;">{{ $template->title }}</div>
-                                    <div style="margin-top:6px;"><span class="template-badge">{{ $template->category ?: 'Général' }}</span></div>
+                                    <div style="font-weight:800; font-size:16px;"><?php echo e($template->title); ?></div>
+                                    <div style="margin-top:6px;"><span class="template-badge"><?php echo e($template->category ?: 'Général'); ?></span></div>
                                 </div>
                                 <div class="template-actions">
-                                    <a class="template-btn" href="{{ route('ris.templates.edit', $template) }}">Modifier</a>
-                                    <form method="POST" action="{{ route('ris.templates.destroy', $template) }}" onsubmit="return confirm('Supprimer ce template ?');">
-                                        @csrf
-                                        @method('DELETE')
+                                    <a class="template-btn" href="<?php echo e(route('ris.templates.edit', $template)); ?>">Modifier</a>
+                                    <form method="POST" action="<?php echo e(route('ris.templates.destroy', $template)); ?>" onsubmit="return confirm('Supprimer ce template ?');">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="template-btn template-btn-danger">Supprimer</button>
                                     </form>
                                 </div>
                             </div>
-                            <div style="margin-top:12px; white-space:pre-line; color:#334155; font-size:13px; line-height:1.6;">{{ \Illuminate\Support\Str::limit(strip_tags($template->content), 260) }}</div>
+                            <div style="margin-top:12px; white-space:pre-line; color:#334155; font-size:13px; line-height:1.6;"><?php echo e(\Illuminate\Support\Str::limit(strip_tags($template->content), 260)); ?></div>
                         </article>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="template-empty">Aucun template enregistré pour le moment.</div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
@@ -102,25 +102,25 @@
             <div class="template-card-inner">
                 <div class="template-toolbar" style="align-items:flex-start;">
                     <div>
-                        <div class="template-title">{{ $editingTemplate ? 'Modifier le template' : 'Nouveau template' }}</div>
+                        <div class="template-title"><?php echo e($editingTemplate ? 'Modifier le template' : 'Nouveau template'); ?></div>
                         <div class="template-muted">Les catégories aident à regrouper Scanner, Radio, Echo et autres modèles.</div>
                     </div>
                 </div>
 
-                <form id="template-form" class="template-form" method="POST" action="{{ $editingTemplate ? route('ris.templates.update', $editingTemplate) : route('ris.templates.store') }}">
-                    @csrf
-                    @if($editingTemplate)
-                        @method('PUT')
-                    @endif
+                <form id="template-form" class="template-form" method="POST" action="<?php echo e($editingTemplate ? route('ris.templates.update', $editingTemplate) : route('ris.templates.store')); ?>">
+                    <?php echo csrf_field(); ?>
+                    <?php if($editingTemplate): ?>
+                        <?php echo method_field('PUT'); ?>
+                    <?php endif; ?>
 
                     <div class="template-grid-form">
                         <div>
                             <label for="category">Catégorie</label>
-                            <input id="category" name="category" list="template_categories" value="{{ old('category', $editingTemplate?->category ?? 'Général') }}" placeholder="Scanner, Radio, Echo...">
+                            <input id="category" name="category" list="template_categories" value="<?php echo e(old('category', $editingTemplate?->category ?? 'Général')); ?>" placeholder="Scanner, Radio, Echo...">
                             <datalist id="template_categories">
-                                @foreach($categories as $category)
-                                    <option value="{{ $category }}"></option>
-                                @endforeach
+                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($category); ?>"></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 <option value="Scanner"></option>
                                 <option value="Radio"></option>
                                 <option value="Echo"></option>
@@ -130,24 +130,19 @@
 
                         <div>
                             <label for="title">Titre</label>
-                            <input id="title" name="title" value="{{ old('title', $editingTemplate?->title) }}" required placeholder="Ex: Panoramique standard">
+                            <input id="title" name="title" value="<?php echo e(old('title', $editingTemplate?->title)); ?>" required placeholder="Ex: Panoramique standard">
                         </div>
 
                         <div>
                             <label>Outils</label>
                             <div class="template-pill-row">
-                                <button type="button" id="template-fullscreen-btn" class="template-btn" title="Plein écran"><i class="ti ti-maximize"></i></button>
-                                <button type="button" id="template-undo-btn" class="template-btn" title="Annuler" data-editor-command="undo"><i class="ti ti-arrow-back-up"></i></button>
-                                <button type="button" id="template-redo-btn" class="template-btn" title="Refaire" data-editor-command="redo"><i class="ti ti-arrow-forward-up"></i></button>
-                                <button type="button" id="template-import-btn" class="template-btn" title="Charger modèle Word"><i class="ti ti-file-import"></i></button>
-                                <button type="button" id="template-export-btn" class="template-btn" title="Exporter .docx"><i class="ti ti-file-export"></i></button>
-                                <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-                                <button type="button" data-editor-command="bold" class="template-btn" title="Gras"><i class="ti ti-bold"></i></button>
-                                <button type="button" data-editor-command="italic" class="template-btn" title="Italique"><i class="ti ti-italic"></i></button>
-                                <button type="button" data-editor-command="underline" class="template-btn" title="Souligné"><i class="ti ti-underline"></i></button>
-                                <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-                                <button type="button" data-editor-command="insertUnorderedList" class="template-btn" title="Liste"><i class="ti ti-list"></i></button>
-                                <button type="button" data-editor-command="insertOrderedList" class="template-btn" title="Liste numérotée"><i class="ti ti-list-numbers"></i></button>
+                                <button type="button" id="template-fullscreen-btn" class="template-btn">Plein ecran</button>
+                                <button type="button" id="template-import-btn" class="template-btn">Charger modele Word</button>
+                                <button type="button" id="template-export-btn" class="template-btn">Exporter .docx</button>
+                                <button type="button" data-editor-command="bold" class="template-btn">B</button>
+                                <button type="button" data-editor-command="italic" class="template-btn">I</button>
+                                <button type="button" data-editor-command="underline" class="template-btn">U</button>
+                                <button type="button" data-editor-command="insertUnorderedList" class="template-btn">• Liste</button>
                                 <select id="template-block-format" class="template-form select template-select-inline">
                                     <option value="">Style</option>
                                     <option value="p">Paragraphe</option>
@@ -158,29 +153,18 @@
                         </div>
 
                         <div>
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                <label for="template_preview_editor" style="margin-bottom:0;">Contenu</label>
-                                <select id="template_insert_field" class="template-form select" style="width:auto;min-width:140px;font-size:12px;">
-                                    <option value="">— Insérer un champ —</option>
-                                    <option value="[NOM_PATIENT]">Nom patient</option>
-                                    <option value="[AGE]">Age</option>
-                                    <option value="[DATE_EXAMEN]">Date examen</option>
-                                    <option value="[MODALITE]">Modalite</option>
-                                </select>
-                            </div>
+                            <label for="template_preview_editor">Contenu</label>
                             <div class="template-editor-shell template-card" id="template-editor-shell">
                                 <div class="template-editor-toolbar">
-                                    <button type="button" data-editor-command="justifyLeft" class="template-btn" title="Aligner à gauche"><i class="ti ti-align-left"></i></button>
-                                    <button type="button" data-editor-command="justifyCenter" class="template-btn" title="Centrer"><i class="ti ti-align-center"></i></button>
-                                    <button type="button" data-editor-command="justifyRight" class="template-btn" title="Aligner à droite"><i class="ti ti-align-right"></i></button>
-                                    <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-                                    <button type="button" data-editor-command="undo" class="template-btn" title="Annuler"><i class="ti ti-arrow-back-up"></i></button>
-                                    <button type="button" data-editor-command="redo" class="template-btn" title="Refaire"><i class="ti ti-arrow-forward-up"></i></button>
-                                    <span style="width:1px;height:24px;background:#e2e8f0;"></span>
-                                    <button type="button" data-editor-snippet="normal" class="template-btn" title="Insérer snippet"><i class="ti ti-code-plus"></i></button>
+                                    <button type="button" data-editor-command="justifyLeft" class="template-btn">Gauche</button>
+                                    <button type="button" data-editor-command="justifyCenter" class="template-btn">Centre</button>
+                                    <button type="button" data-editor-command="justifyRight" class="template-btn">Droite</button>
+                                    <button type="button" data-editor-command="undo" class="template-btn">Annuler</button>
+                                    <button type="button" data-editor-command="redo" class="template-btn">Refaire</button>
+                                    <button type="button" data-editor-snippet="normal" class="template-btn">Snippet</button>
                                 </div>
-                                <div id="template_preview_editor" class="template-editor" contenteditable="true">{!! old('content', $editingTemplate?->content) !!}</div>
-                                <textarea id="content" name="content" hidden required>{{ old('content', $editingTemplate?->content) }}</textarea>
+                                <div id="template_preview_editor" class="template-editor" contenteditable="true"><?php echo old('content', $editingTemplate?->content); ?></div>
+                                <textarea id="content" name="content" hidden required><?php echo e(old('content', $editingTemplate?->content)); ?></textarea>
                                 <input id="template-word-input" type="file" accept=".docx" hidden>
                             </div>
                             <div class="template-helper">Le contenu est sauvegardé en HTML enrichi, puis nettoyé côté serveur.</div>
@@ -188,10 +172,10 @@
                     </div>
 
                     <div class="template-footer">
-                        <button type="submit" class="template-btn template-btn-primary">{{ $editingTemplate ? 'Mettre à jour' : 'Enregistrer' }}</button>
-                        @if($editingTemplate)
-                            <a href="{{ route('ris.templates.index') }}" class="template-btn">Annuler</a>
-                        @endif
+                        <button type="submit" class="template-btn template-btn-primary"><?php echo e($editingTemplate ? 'Mettre à jour' : 'Enregistrer'); ?></button>
+                        <?php if($editingTemplate): ?>
+                            <a href="<?php echo e(route('ris.templates.index')); ?>" class="template-btn">Annuler</a>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -199,7 +183,7 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const canEdit = true;
@@ -323,8 +307,7 @@
             editorShell.classList.toggle('is-fullscreen', isFullscreen);
             document.body.classList.toggle('template-no-scroll', isFullscreen);
             if (fullscreenButton) {
-                fullscreenButton.innerHTML = isFullscreen ? '<i class="ti ti-minimize"></i>' : '<i class="ti ti-maximize"></i>';
-                fullscreenButton.title = isFullscreen ? 'Quitter plein écran' : 'Plein écran';
+                fullscreenButton.textContent = isFullscreen ? 'Quitter plein ecran' : 'Plein ecran';
             }
             focusEditor();
         };
@@ -346,14 +329,6 @@
             syncHidden();
             rememberSelection();
             blockFormatSelect.selectedIndex = 0;
-        });
-
-        const insertFieldSelect = document.getElementById('template_insert_field');
-        insertFieldSelect?.addEventListener('change', () => {
-            const val = insertFieldSelect.value;
-            if (!val) return;
-            insertContent(val);
-            insertFieldSelect.selectedIndex = 0;
         });
 
         toolbarButtons.forEach(btn => btn.addEventListener('mousedown', (event) => {
@@ -433,5 +408,6 @@
         });
     });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\xampp8.2\htdocs\fils_attente\Modules\RIS\Providers/../Resources/views/templates/index.blade.php ENDPATH**/ ?>
