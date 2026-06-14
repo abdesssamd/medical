@@ -427,7 +427,7 @@ class OrthancService
      */
     public function createModalityWorklistForOrder(RisOrder $order): array
     {
-        $dataset = $this->buildMwlDatasetFromOrder($order->loadMissing(['patient', 'procedure', 'modality']));
+        $dataset = $this->buildMwlDatasetFromOrder($order->loadMissing(['patient', 'procedure', 'modality', 'equipment']));
         $filePath = $this->writeWorklistFile($order, $dataset);
         $result = $this->createModalityWorklist($dataset);
 
@@ -474,6 +474,71 @@ class OrthancService
     }
 
     /**
+     * Upload un fichier DICOM vers Orthanc via POST /instances.
+     */
+    public function uploadDicomFile(string $filePath): array
+    {
+        try {
+            $fileContent = file_get_contents($filePath);
+            if ($fileContent === false) {
+                return ['ok' => false, 'message' => 'Impossible de lire le fichier.'];
+            }
+
+            $response = $this->client()
+                ->withHeader('Content-Type', 'application/dicom')
+                ->timeout(120)
+                ->send('POST', '/instances', ['body' => $fileContent]);
+
+            if ($response->failed()) {
+                return [
+                    'ok' => false,
+                    'status' => $response->status(),
+                    'message' => $response->body(),
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'status' => $response->status(),
+                'data' => $response->json(),
+            ];
+        } catch (\Throwable $exception) {
+            Log::warning('ris.orthanc.upload_dicom_failed', ['error' => $exception->getMessage()]);
+
+            return [
+                'ok' => false,
+                'message' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Upload plusieurs fichiers DICOM vers Orthanc.
+     * Retourne le nombre de succes et la liste des resultats.
+     */
+    public function uploadDicomFiles(array $filePaths): array
+    {
+        $results = [];
+        $successCount = 0;
+
+        foreach ($filePaths as $filePath) {
+            $result = $this->uploadDicomFile($filePath);
+            $result['file'] = basename($filePath);
+            if ($result['ok']) {
+                $successCount++;
+            }
+            $results[] = $result;
+        }
+
+        return [
+            'ok' => $successCount > 0,
+            'total' => count($filePaths),
+            'success' => $successCount,
+            'results' => $results,
+        ];
+    }
+
+    /**
      * Construit un jeu de tags minimal depuis une demande RIS.
      */
     public function buildMwlDatasetFromOrder(RisOrder $order): array
@@ -481,6 +546,7 @@ class OrthancService
         $patient = $order->patient;
         $procedure = $order->procedure;
         $modality = $order->modality;
+        $equipment = $order->equipment;
         $scheduledAt = $order->scheduled_at ?? $order->requested_at ?? now();
         $accessionNumber = (string) ($order->accession_number ?: 'RIS-'.$order->id);
         $procedureLabel = (string) ($procedure?->label ?? 'Examen radiologique');
@@ -491,6 +557,7 @@ class OrthancService
             'f', 'female', 'femme' => 'F',
             default => 'O',
         };
+        $stationAe = (string) ($equipment?->ae_title ?: $modality?->ae_title ?: 'MODALITY_AE');
 
         return [
             '0010,0010' => trim((string) $patient?->last_name).'^'.trim((string) $patient?->first_name),
@@ -504,7 +571,7 @@ class OrthancService
             '0040,0100' => [
                 [
                     '0008,0060' => $this->mapModalityTypeToDicom((string) ($modality?->type ?? '')),
-                    '0040,0001' => (string) ($modality?->ae_title ?? 'MODALITY_AE'),
+                    '0040,0001' => $stationAe,
                     '0040,0002' => $scheduledAt->format('Ymd'),
                     '0040,0003' => $scheduledAt->format('His'),
                     '0040,0006' => strtoupper((string) ($procedure?->code ?? 'RISPROC')),
@@ -624,12 +691,10 @@ class OrthancService
 
     private function mapModalityTypeToDicom(string $type): string
     {
-        return match (strtolower($type)) {
-            'radio' => 'DX',
-            'scanner' => 'CT',
-            'panoramique' => 'PX',
-            default => 'OT',
-        };
+        $dicomCodes = ['DX', 'CR', 'CT', 'MR', 'US', 'MG', 'XA', 'PX', 'OT'];
+        $upper = strtoupper($type);
+
+        return in_array($upper, $dicomCodes, true) ? $upper : 'OT';
     }
 
     private function client(): PendingRequest

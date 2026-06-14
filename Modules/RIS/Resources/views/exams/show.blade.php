@@ -31,7 +31,7 @@
 
     $viewerStudyId = $studyUuid ?: $orthancStudyId;
     $orthancViewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/');
-    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode((string) $viewerStudyId) : null;
+    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/ohif/viewer?StudyInstanceUIDs='.urlencode((string) $viewerStudyId) : null;
 
     $timelineSteps = [
         ['label' => 'Demande', 'done' => true, 'value' => optional($order->requested_at)->format('d/m/Y H:i') ?: 'Non renseigne'],
@@ -275,7 +275,11 @@
                 </div>
             </section>
 
-            <section class="risx-card risx-viewer-box">
+            <section class="risx-card risx-viewer-box" id="risxViewerBox">
+                <div class="risx-viewer-toolbar">
+                    <span class="risx-viewer-label">OHIF Viewer</span>
+                    <button type="button" id="viewerFullscreenButton" class="risx-btn" title="Ouvrir en plein écran"><i class="ti ti-maximize"></i> Plein écran</button>
+                </div>
                 <div id="orthancViewerFrameContainer">
                     @if($viewerUrl)
                         <iframe src="{{ $viewerUrl }}" frameborder="0"></iframe>
@@ -381,8 +385,18 @@
     .risx-floating-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; padding: 10px 0; }
 
     .risx-viewer-box { min-height: 520px; padding: 12px; }
+    .risx-viewer-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 10px; }
+    .risx-viewer-label { font-size: 0.84rem; font-weight: 800; color: #334155; }
     #orthancViewerFrameContainer { width: 100%; height: min(72vh, 760px); min-height: 520px; border-radius: 10px; overflow: hidden; background: #eef4fb; display: grid; }
     #orthancViewerFrameContainer iframe { width: 100%; height: 100%; border: 0; background: #111827; }
+    .risx-viewer-box.is-fullscreen {
+        position: fixed; inset: 0; z-index: 9999; border-radius: 0; border: 0;
+        display: grid; grid-template-rows: auto minmax(0, 1fr); padding: 8px 12px; background: #000;
+    }
+    .risx-viewer-box.is-fullscreen .risx-viewer-toolbar { padding: 6px 4px 10px; }
+    .risx-viewer-box.is-fullscreen .risx-viewer-label { color: #fff; }
+    .risx-viewer-box.is-fullscreen #orthancViewerFrameContainer { height: 100%; min-height: 0; border-radius: 0; }
+    .risx-viewer-box.is-fullscreen #orthancViewerFrameContainer iframe { background: #000; }
 
     @media (max-width: 1100px) {
         .risx-workbench, .risx-grid12 { grid-template-columns: 1fr; }
@@ -611,6 +625,29 @@
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && isFullscreen) {
                 toggleFullscreen();
+            }
+        });
+
+        const viewerBox = document.getElementById('risxViewerBox');
+        const viewerFullscreenButton = document.getElementById('viewerFullscreenButton');
+        let isViewerFullscreen = false;
+
+        const toggleViewerFullscreen = () => {
+            isViewerFullscreen = !isViewerFullscreen;
+            viewerBox?.classList.toggle('is-fullscreen', isViewerFullscreen);
+            document.body.classList.toggle('risx-no-scroll', isViewerFullscreen);
+            if (viewerFullscreenButton) {
+                viewerFullscreenButton.innerHTML = isViewerFullscreen
+                    ? '<i class="ti ti-minimize"></i> Quitter plein écran'
+                    : '<i class="ti ti-maximize"></i> Plein écran';
+            }
+        };
+
+        viewerFullscreenButton?.addEventListener('click', toggleViewerFullscreen);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && isViewerFullscreen) {
+                toggleViewerFullscreen();
             }
         });
 

@@ -658,14 +658,15 @@
                 ['label' => 'Utilisateurs', 'route' => 'users.index', 'active' => 'users.*'],
                 ['label' => 'Paramétrage des plannings', 'route' => 'admin.planning.settings', 'active' => 'admin.planning.*'],
                 ['label' => 'Borne d\'accueil', 'route' => 'admin.settings', 'active' => 'admin.settings*'],
-				['label' => 'Templates RIS', 'route' => 'ris.templates.index', 'active' => 'ris.templates.*'],
                 ['label' => 'Questionnaires', 'route' => 'clinical.questionnaire-templates.index', 'active' => 'clinical.questionnaire-templates.*'],
+                ['label' => 'Liste des médicaments', 'route' => 'admin.medications.index', 'active' => 'admin.medications.*'],
+                ['label' => 'Liste des codes CIM-10', 'route' => 'admin.icd10-codes.index', 'active' => 'admin.icd10-codes.*'],
                 
-				['label' => 'Paramètres généraux', 'icon' => 'ti ti-adjustments', 'submenu' => [
+				['label' => 'RIS', 'icon' => 'ti ti-microscope', 'submenu' => [
                     ['label' => 'Actes RIS', 'route' => 'ris.parametrage.procedures.index', 'active' => 'ris.parametrage.procedures.*'],
                     ['label' => 'Modalités RIS', 'route' => 'ris.parametrage.modalities.index', 'active' => 'ris.parametrage.modalities.*'],
-                    ['label' => 'Liste des médicaments', 'route' => 'admin.medications.index', 'active' => 'admin.medications.*'],
-                    ['label' => 'Liste des codes CIM-10', 'route' => 'admin.icd10-codes.index', 'active' => 'admin.icd10-codes.*'],
+                    ['label' => 'Équipements RIS', 'route' => 'ris.parametrage.equipments.index', 'active' => 'ris.parametrage.equipments.*'],
+                    ['label' => 'Templates RIS', 'route' => 'ris.templates.index', 'active' => 'ris.templates.*'],
                 ]],
             ]],
         ];
@@ -862,39 +863,38 @@
 
 <script>
     // Fonction pour ouvrir/fermer les sous-menus
-    function toggleSubmenu(event, element) {
+    window.toggleSubmenu = function(event, element) {
         event.preventDefault();
         element.classList.toggle('submenu-open');
         const submenu = element.nextElementSibling;
         if (submenu) {
             submenu.classList.toggle('show');
         }
-    }
+    };
 
-    // Mobile sidebar toggle (sans toucher aux fonctionnalités existantes)
-    const mobileToggle = document.getElementById('mobileToggleBtn');
-    const sidebar = document.getElementById('sidebar');
-    
-    if (mobileToggle && sidebar) {
-        mobileToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('mobile-open');
-        });
+    // Mobile sidebar toggle - protégé contre la ré-injection SPA
+    if (!window._sidebarInited) {
+        window._sidebarInited = true;
+        const mt = document.getElementById('mobileToggleBtn');
+        const sb = document.getElementById('sidebar');
         
-        // Fermer le sidebar si on clique en dehors sur mobile
-        document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 992) {
-                const isClickInside = sidebar.contains(event.target) || mobileToggle.contains(event.target);
-                if (!isClickInside && sidebar.classList.contains('mobile-open')) {
-                    sidebar.classList.remove('mobile-open');
+        if (mt && sb) {
+            mt.addEventListener('click', function() {
+                sb.classList.toggle('mobile-open');
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 992) {
+                    const isClickInside = sb.contains(event.target) || mt.contains(event.target);
+                    if (!isClickInside && sb.classList.contains('mobile-open')) {
+                        sb.classList.remove('mobile-open');
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     
-    // S'assurer que le badge et le contexte patient fonctionnent comme avant
-    // (conserve toutes les fonctionnalités existantes)
     if (typeof window.dispatchEvent === 'function') {
-        // déclencher un événement pour signaler que le DOM est prêt
         document.dispatchEvent(new Event('DOMContentLoaded'));
     }
 </script>
@@ -902,36 +902,38 @@
 @stack('scripts')
 
 <script>
-    // Tiny helper pour s'assurer que le context patient s'affiche comme avant
-    (function() {
-        const oldShowContext = window.showPatientContext;
-        window.showPatientContext = window.showPatientContext || function(patient) {
-            const chip = document.getElementById('header-patient-context');
-            if (chip && patient) {
-                chip.classList.remove('d-none');
-                const nameSpan = document.getElementById('header-patient-name');
-                const mrnSpan = document.getElementById('header-patient-mrn');
-                const ageSpan = document.getElementById('header-patient-age');
-                const phoneSpan = document.getElementById('header-patient-phone');
-                if (nameSpan) nameSpan.innerText = patient.name || patient.full_name || '-';
-                if (mrnSpan) mrnSpan.innerText = patient.mrn || patient.id || '-';
-                if (ageSpan) ageSpan.innerText = patient.age || patient.birth_date ? '--' : '-';
-                if (phoneSpan) phoneSpan.innerText = patient.phone || patient.mobile || '-';
-            }
-            if (oldShowContext) oldShowContext(patient);
-        };
-        
-        const releaseBtn = document.getElementById('header-patient-release');
-        if (releaseBtn) {
-            releaseBtn.addEventListener('click', function() {
+    // Helper patient context - protégé SPA
+    if (!window._patientContextInited) {
+        window._patientContextInited = true;
+        (function() {
+            const oldShowContext = window.showPatientContext;
+            window.showPatientContext = window.showPatientContext || function(patient) {
                 const chip = document.getElementById('header-patient-context');
-                if (chip) chip.classList.add('d-none');
-                // Déclencher un event pour les autres modules
-                const event = new CustomEvent('patient-released');
-                document.dispatchEvent(event);
-            });
-        }
-    })();
+                if (chip && patient) {
+                    chip.classList.remove('d-none');
+                    const nameSpan = document.getElementById('header-patient-name');
+                    const mrnSpan = document.getElementById('header-patient-mrn');
+                    const ageSpan = document.getElementById('header-patient-age');
+                    const phoneSpan = document.getElementById('header-patient-phone');
+                    if (nameSpan) nameSpan.innerText = patient.name || patient.full_name || '-';
+                    if (mrnSpan) mrnSpan.innerText = patient.mrn || patient.id || '-';
+                    if (ageSpan) ageSpan.innerText = patient.age || patient.birth_date ? '--' : '-';
+                    if (phoneSpan) phoneSpan.innerText = patient.phone || patient.mobile || '-';
+                }
+                if (oldShowContext) oldShowContext(patient);
+            };
+            
+            const releaseBtn = document.getElementById('header-patient-release');
+            if (releaseBtn) {
+                releaseBtn.addEventListener('click', function() {
+                    const chip = document.getElementById('header-patient-context');
+                    if (chip) chip.classList.add('d-none');
+                    const event = new CustomEvent('patient-released');
+                    document.dispatchEvent(event);
+                });
+            }
+        })();
+    }
 </script>
 
 </body>

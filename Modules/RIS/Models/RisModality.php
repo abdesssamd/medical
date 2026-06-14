@@ -10,21 +10,32 @@ class RisModality extends Model
 {
     use HasFactory;
 
-    public const TYPE_RADIO = 'radio';
-    public const TYPE_SCANNER = 'scanner';
-    public const TYPE_PANORAMIQUE = 'panoramique';
+    public const TYPES = [
+        'DX' => 'Radiographie Numérique',
+        'CR' => 'Radiologie Calculée',
+        'CT' => 'Scanner / TDM',
+        'MR' => 'IRM',
+        'US' => 'Échographie / Doppler',
+        'MG' => 'Mammographie',
+        'XA' => 'Angiographie / Radiologie Interventionnelle',
+        'PX' => 'Panoramique Dentaire',
+    ];
 
     protected $table = 'ris_modalities';
 
     protected $fillable = [
         'name',
         'type',
-        'ae_title',
-        'ip_address',
+        'description',
     ];
 
     public function orders(): HasMany
     {
         return $this->hasMany(RisOrder::class, 'modality_id');
+    }
+
+    public function equipments(): HasMany
+    {
+        return $this->hasMany(RisEquipment::class, 'modality_id');
     }
 }

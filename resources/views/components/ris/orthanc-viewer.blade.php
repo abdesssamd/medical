@@ -7,7 +7,7 @@
     $viewerUrl = rtrim((string) $baseUrl, '/');
 
     if (! empty($studyId)) {
-        $viewerUrl .= '/osirix/viewer?study=' . urlencode((string) $studyId);
+        $viewerUrl .= '/ohif/viewer?StudyInstanceUIDs=' . urlencode((string) $studyId);
     }
 @endphp
 

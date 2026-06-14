@@ -1,13 +1,22 @@
 @props([
     'title' => '',
+    'variant' => 'default', // default, modern, flat
 ])
 
-<div {{ $attributes->class(['card']) }}>
+@php
+    $classes = match($variant) {
+        'modern' => 'content-card',
+        'flat' => 'card card-flat',
+        default => 'card',
+    };
+@endphp
+
+<div {{ $attributes->class([$classes]) }}>
     @if($title !== '' || isset($options))
-        <div class="card-header">
-            <h3 class="card-title">{{ $title }}</h3>
+        <div @class(['card-header-custom' => $variant === 'modern', 'card-header' => $variant !== 'modern'])>
+            <h3 @class(['card-title' => $variant !== 'modern', 'fw-bold' => true])>{{ $title }}</h3>
             @if(isset($options))
-                <div class="card-actions">
+                <div @class(['card-actions' => $variant !== 'modern'])>
                     {{ $options }}
                 </div>
             @endif

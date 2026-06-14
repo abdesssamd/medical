@@ -1,109 +1,110 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Tableau de bord')
-@section('page-title', 'Tableau de bord')
+@section('page_pretitle', 'Accueil')
+@section('page_title', 'Tableau de bord')
 
 @section('content')
-<div class="page-stack">
+<div style="display:grid; gap:24px;">
     {{-- Welcome Section --}}
-    <div class="welcome-card">
-        <div class="welcome-text">
-            <h2>Bonjour, {{ auth()->user()->name }} 👋</h2>
-            <p>Voici un résumé de votre activité aujourd'hui</p>
+    <div class="content-card" style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:white; border:none; display:flex; justify-content:space-between; align-items:center; padding:28px 32px;">
+        <div>
+            <h2 style="font-size:22px; font-weight:700; margin-bottom:4px;">Bonjour, {{ auth()->user()->name }}</h2>
+            <p style="color:#94a3b8; font-size:14px;">Voici un résumé de votre activité aujourd'hui</p>
         </div>
-        <div class="welcome-date">
-            <div class="date-day">{{ now()->locale(app()->getLocale())->isoFormat('dddd D MMMM YYYY') }}</div>
-            <div class="date-time">{{ now()->format('H:i') }}</div>
+        <div style="text-align:right;">
+            <div style="color:#cbd5e1; font-size:13px;">{{ now()->locale(app()->getLocale())->isoFormat('dddd D MMMM YYYY') }}</div>
+            <div style="font-size:36px; font-weight:700; font-family:'Inter', monospace; line-height:1.2;">{{ now()->format('H:i') }}</div>
         </div>
     </div>
 
-    {{-- Main Stats --}}
-    <div class="grid-stats">
-        <div class="card stat-card stat-blue">
-            <div class="stat-icon">👥</div>
-            <div class="stat-info">
-                <div class="stat-label">Patients</div>
-                <div class="stat-value">{{ \App\Models\Patient::count() }}</div>
-            </div>
+    {{-- Stats Grid --}}
+    <div class="stats-grid">
+        <div class="stat-card-modern">
+            <div class="stat-icon stat-icon-blue"><i class="ti ti-users"></i></div>
+            <div class="stat-label">Patients</div>
+            <div class="stat-value">{{ \App\Models\Patient::count() }}</div>
         </div>
-        <div class="card stat-card stat-green">
-            <div class="stat-icon">📅</div>
-            <div class="stat-info">
-                <div class="stat-label">RDV aujourd'hui</div>
-                <div class="stat-value">{{ \Modules\Appointment\Models\Appointment::whereDate('appointment_date', today())->count() }}</div>
-            </div>
+        <div class="stat-card-modern">
+            <div class="stat-icon stat-icon-green"><i class="ti ti-calendar-stats"></i></div>
+            <div class="stat-label">RDV aujourd'hui</div>
+            <div class="stat-value">{{ class_exists(\Modules\Appointment\Models\Appointment::class) ? \Modules\Appointment\Models\Appointment::whereDate('appointment_date', today())->count() : 0 }}</div>
         </div>
-        <div class="card stat-card stat-orange">
-            <div class="stat-icon">🎫</div>
-            <div class="stat-info">
-                <div class="stat-label">Tickets en attente</div>
-                <div class="stat-value">{{ \Modules\Queue\Models\Ticket::whereDate('ticket_date', today())->where('status', 'waiting')->count() }}</div>
-            </div>
+        <div class="stat-card-modern">
+            <div class="stat-icon stat-icon-yellow"><i class="ti ti-ticket"></i></div>
+            <div class="stat-label">Tickets en attente</div>
+            <div class="stat-value">{{ class_exists(\Modules\Queue\Models\Ticket::class) ? \Modules\Queue\Models\Ticket::whereDate('ticket_date', today())->where('status', 'waiting')->count() : 0 }}</div>
         </div>
-        <div class="card stat-card stat-purple">
-            <div class="stat-icon">💰</div>
-            <div class="stat-info">
-                <div class="stat-label">Revenu du mois</div>
-                <div class="stat-value">{{ number_format(\Modules\Billing\Models\Payment::whereMonth('payment_date', now()->month)->sum('amount'), 0) }} MAD</div>
-            </div>
+        <div class="stat-card-modern">
+            <div class="stat-icon stat-icon-purple"><i class="ti ti-report-money"></i></div>
+            <div class="stat-label">Revenu du mois</div>
+            <div class="stat-value">{{ class_exists(\Modules\Billing\Models\Payment::class) ? number_format(\Modules\Billing\Models\Payment::whereMonth('payment_date', now()->month)->sum('amount'), 0) : 0 }} MAD</div>
         </div>
     </div>
 
     {{-- Quick Access --}}
-    <div class="quick-access-grid">
-        <h3 class="section-title">🚀 Accès rapide</h3>
-        <div class="quick-cards">
-            <a href="{{ route('scheduling.dashboard') }}" class="quick-card quick-blue">
-                <span class="quick-icon">📅</span>
-                <span class="quick-label">Planification</span>
-                <span class="quick-desc">Planning & disponibilités</span>
-            </a>
-            <a href="{{ route('clinical.patients') }}" class="quick-card quick-green">
-                <span class="quick-icon">👥</span>
-                <span class="quick-label">Patients</span>
-                <span class="quick-desc">Dossiers cliniques</span>
-            </a>
-            <a href="{{ route('billing.dashboard') }}" class="quick-card quick-orange">
-                <span class="quick-icon">💰</span>
-                <span class="quick-label">Facturation</span>
-                <span class="quick-desc">Paiements & assurances</span>
-            </a>
-            <a href="{{ route('admin.dashboard') }}" class="quick-card quick-purple">
-                <span class="quick-icon">🏥</span>
-                <span class="quick-label">Queue</span>
-                <span class="quick-desc">File d'attente</span>
-            </a>
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h3><i class="ti ti-rocket" style="margin-right:8px;"></i>Accès rapide</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+            @php
+                $quickLinks = [];
+                if (auth()->user()?->hasAnyRole(['super_admin', 'admin', 'professional', 'doctor', 'medecin', 'secretary', 'secretaire', 'assistant'])) {
+                    $quickLinks = [
+                        ['label' => 'Planification', 'icon' => 'ti ti-calendar-time', 'desc' => 'Planning & disponibilités', 'route' => 'scheduling.dashboard', 'color' => '#dbeafe', 'iconColor' => '#1d4ed8'],
+                        ['label' => 'Patients', 'icon' => 'ti ti-users-group', 'desc' => 'Dossiers cliniques', 'route' => 'clinical.patients', 'color' => '#d1fae5', 'iconColor' => '#065f46'],
+                        ['label' => 'Facturation', 'icon' => 'ti ti-cash', 'desc' => 'Paiements & assurances', 'route' => 'billing.dashboard', 'color' => '#fef3c7', 'iconColor' => '#92400e'],
+                        ['label' => 'File d\'attente', 'icon' => 'ti ti-list-numbers', 'desc' => 'Gestion des tickets', 'route' => 'admin.dashboard', 'color' => '#ede9fe', 'iconColor' => '#6d28d9'],
+                    ];
+                }
+            @endphp
+            @foreach($quickLinks as $link)
+                @if(Route::has($link['route']))
+                    <a href="{{ route($link['route']) }}" style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 16px; border-radius:16px; text-decoration:none; background:{{ $link['color'] }}; transition:all 0.2s; border:2px solid transparent;" onmouseover="this.style.borderColor='{{ $link['iconColor'] }}'; this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='transparent'; this.style.transform='none'">
+                        <i class="{{ $link['icon'] }}" style="font-size:28px; color:{{ $link['iconColor'] }};"></i>
+                        <span style="font-weight:700; font-size:14px; color:#0f172a;">{{ $link['label'] }}</span>
+                        <span style="font-size:12px; color:#475569;">{{ $link['desc'] }}</span>
+                    </a>
+                @endif
+            @endforeach
         </div>
     </div>
 
-    {{-- Today's Appointments --}}
-    <div class="dashboard-grid">
-        <div class="card">
-            <h3 class="card-title">📅 Rendez-vous du jour</h3>
+    {{-- Content Grid --}}
+    <div class="content-grid">
+        {{-- Today's Appointments --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-calendar-event" style="margin-right:8px;"></i>Rendez-vous du jour</h3>
+            </div>
             @php
-                $todayAppointments = \Modules\Appointment\Models\Appointment::whereDate('appointment_date', today())
-                    ->with(['patient', 'professional', 'appointmentType'])
-                    ->orderBy('start_time')
-                    ->limit(10)
-                    ->get();
+                $todayAppointments = class_exists(\Modules\Appointment\Models\Appointment::class)
+                    ? \Modules\Appointment\Models\Appointment::whereDate('appointment_date', today())
+                        ->with(['patient', 'professional', 'appointmentType'])
+                        ->orderBy('start_time')
+                        ->limit(10)
+                        ->get()
+                    : collect();
             @endphp
             @if($todayAppointments->isEmpty())
-                <div class="empty-state">
+                <div class="empty-state-modern">
+                    <i class="ti ti-calendar-off"></i>
                     <p>Aucun rendez-vous aujourd'hui</p>
                 </div>
             @else
-                <div class="appointment-list">
+                <div style="display:flex; flex-direction:column; gap:6px;">
                     @foreach($todayAppointments as $apt)
-                    <div class="appointment-item status-{{ $apt->status }}">
-                        <div class="apt-time">{{ \Carbon\Carbon::parse($apt->start_time)->format('H:i') }}</div>
-                        <div class="apt-details">
-                            <div class="apt-patient">{{ $apt->patient?->full_name ?? $apt->patient_name ?? '-' }}</div>
-                            <div class="apt-meta">
-                                <span class="badge badge-primary">{{ $apt->professional?->name ?? '-' }}</span>
+                    <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; background:#f8fafc; border-left:3px solid {{ $apt->status === 'consulted' ? '#10b981' : ($apt->status === 'cancelled' ? '#ef4444' : '#f59e0b') }};">
+                        <div style="font-weight:700; font-size:14px; font-family:'Inter', monospace; min-width:48px; color:#334155;">{{ \Carbon\Carbon::parse($apt->start_time)->format('H:i') }}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:13px; margin-bottom:2px;">{{ $apt->patient?->full_name ?? $apt->patient_name ?? '-' }}</div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <span class="badge-modern badge-blue">{{ $apt->professional?->name ?? '-' }}</span>
                                 @if($apt->appointmentType)
-                                    <span class="badge badge-secondary">{{ $apt->appointmentType->name }}</span>
+                                    <span class="badge-modern badge-gray">{{ $apt->appointmentType->name }}</span>
                                 @endif
-                                <span class="badge badge-{{ $apt->status === 'consulted' ? 'success' : ($apt->status === 'cancelled' ? 'danger' : 'warning') }}">
+                                <span class="badge-modern {{ $apt->status === 'consulted' ? 'badge-green' : ($apt->status === 'cancelled' ? 'badge-red' : 'badge-yellow') }}">
                                     {{ $apt->status }}
                                 </span>
                             </div>
@@ -114,32 +115,38 @@
             @endif
         </div>
 
-        <div class="card">
-            <h3 class="card-title">🎫 Queue en temps réel</h3>
+        {{-- Queue in Real Time --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-ticket" style="margin-right:8px;"></i>Queue en temps réel</h3>
+            </div>
             @php
-                $todayTickets = \Modules\Queue\Models\Ticket::whereDate('ticket_date', today())
-                    ->with(['service', 'counter', 'agent'])
-                    ->orderByDesc('created_at')
-                    ->limit(10)
-                    ->get();
+                $todayTickets = class_exists(\Modules\Queue\Models\Ticket::class)
+                    ? \Modules\Queue\Models\Ticket::whereDate('ticket_date', today())
+                        ->with(['service', 'counter', 'agent'])
+                        ->orderByDesc('created_at')
+                        ->limit(10)
+                        ->get()
+                    : collect();
             @endphp
             @if($todayTickets->isEmpty())
-                <div class="empty-state">
+                <div class="empty-state-modern">
+                    <i class="ti ti-ticket-off"></i>
                     <p>Aucun ticket aujourd'hui</p>
                 </div>
             @else
-                <div class="ticket-list">
+                <div style="display:flex; flex-direction:column; gap:6px;">
                     @foreach($todayTickets as $ticket)
-                    <div class="ticket-item">
-                        <div class="ticket-number">{{ $ticket->ticket_number }}</div>
-                        <div class="ticket-info">
-                            <div class="ticket-service">{{ $ticket->service?->name ?? '-' }}</div>
-                            <div class="ticket-meta">
-                                <span class="badge badge-{{ $ticket->status === 'served' ? 'success' : ($ticket->status === 'waiting' ? 'warning' : 'info') }}">
+                    <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; background:#f8fafc;">
+                        <div style="font-weight:800; font-size:16px; font-family:'Inter', monospace; min-width:72px; color:#1d4ed8;">{{ $ticket->ticket_number }}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:13px;">{{ $ticket->service?->name ?? '-' }}</div>
+                            <div style="display:flex; gap:6px; margin-top:4px;">
+                                <span class="badge-modern {{ $ticket->status === 'served' ? 'badge-green' : ($ticket->status === 'waiting' ? 'badge-yellow' : 'badge-blue') }}">
                                     {{ $ticket->status }}
                                 </span>
                                 @if($ticket->counter)
-                                    <span class="badge badge-secondary">{{ $ticket->counter->name }}</span>
+                                    <span class="badge-modern badge-gray">{{ $ticket->counter->name }}</span>
                                 @endif
                             </div>
                         </div>
@@ -149,57 +156,69 @@
             @endif
         </div>
 
-        <div class="card">
-            <h3 class="card-title">💰 Derniers paiements</h3>
+        {{-- Recent Payments --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-cash" style="margin-right:8px;"></i>Derniers paiements</h3>
+            </div>
             @php
-                $recentPayments = \Modules\Billing\Models\Payment::with(['invoice', 'patient'])
-                    ->orderByDesc('created_at')
-                    ->limit(8)
-                    ->get();
+                $recentPayments = class_exists(\Modules\Billing\Models\Payment::class)
+                    ? \Modules\Billing\Models\Payment::with(['invoice', 'patient'])
+                        ->orderByDesc('created_at')
+                        ->limit(8)
+                        ->get()
+                    : collect();
             @endphp
             @if($recentPayments->isEmpty())
-                <div class="empty-state">
+                <div class="empty-state-modern">
+                    <i class="ti ti-credit-card-off"></i>
                     <p>Aucun paiement enregistré</p>
                 </div>
             @else
-                <div class="payment-list">
+                <div style="display:flex; flex-direction:column; gap:6px;">
                     @foreach($recentPayments as $payment)
-                    <div class="payment-item">
-                        <div class="payment-info">
-                            <div class="payment-patient">{{ $payment->patient?->full_name ?? '-' }}</div>
-                            <div class="payment-meta">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:10px; background:#f8fafc;">
+                        <div>
+                            <div style="font-weight:600; font-size:13px;">{{ $payment->patient?->full_name ?? '-' }}</div>
+                            <div style="font-size:11px; color:#64748b; display:flex; gap:8px; margin-top:2px;">
                                 <span>{{ $payment->payment_number }}</span>
                                 <span>{{ ucfirst($payment->method) }}</span>
                             </div>
                         </div>
-                        <div class="payment-amount">{{ number_format($payment->amount, 2) }} MAD</div>
+                        <div style="font-weight:700; font-size:16px; color:#065f46;">{{ number_format($payment->amount, 2) }} MAD</div>
                     </div>
                     @endforeach
                 </div>
             @endif
         </div>
 
-        <div class="card">
-            <h3 class="card-title">⚠️ Alertes</h3>
+        {{-- Alerts --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-bell" style="margin-right:8px;"></i>Alertes</h3>
+            </div>
             @php
-                $alerts = \Modules\Queue\Models\SupervisorAlert::where('is_resolved', false)
-                    ->with(['ticket'])
-                    ->orderByDesc('created_at')
-                    ->limit(5)
-                    ->get();
+                $alerts = class_exists(\Modules\Queue\Models\SupervisorAlert::class)
+                    ? \Modules\Queue\Models\SupervisorAlert::where('is_resolved', false)
+                        ->with(['ticket'])
+                        ->orderByDesc('created_at')
+                        ->limit(5)
+                        ->get()
+                    : collect();
             @endphp
             @if($alerts->isEmpty())
-                <div class="empty-state">
-                    <p>✅ Aucune alerte active</p>
+                <div class="empty-state-modern">
+                    <i class="ti ti-shield-check" style="color:#10b981; opacity:1;"></i>
+                    <p style="color:#065f46;">Aucune alerte active</p>
                 </div>
             @else
-                <div class="alert-list">
+                <div style="display:flex; flex-direction:column; gap:6px;">
                     @foreach($alerts as $alert)
-                    <div class="alert-item alert-item-warning">
-                        <span class="alert-icon">⚠️</span>
-                        <div class="alert-text">
-                            <div>{{ $alert->message }}</div>
-                            <div class="alert-time">{{ $alert->created_at->diffForHumans() }}</div>
+                    <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:10px; background:#fef3c7;">
+                        <i class="ti ti-alert-triangle" style="color:#d97706; font-size:18px; flex-shrink:0; margin-top:1px;"></i>
+                        <div>
+                            <div style="font-size:13px; color:#92400e;">{{ $alert->message }}</div>
+                            <div style="font-size:11px; color:#a16207; margin-top:2px;">{{ $alert->created_at->diffForHumans() }}</div>
                         </div>
                     </div>
                     @endforeach
@@ -208,232 +227,4 @@
         </div>
     </div>
 </div>
-
-@push('head')
-<style>
-    .welcome-card {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: white;
-        border-radius: var(--radius-lg);
-        padding: var(--spacing-xl);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .welcome-text h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .welcome-text p {
-        color: #94a3b8;
-        font-size: 0.9rem;
-    }
-
-    .welcome-date {
-        text-align: right;
-    }
-
-    .date-day {
-        font-size: 0.9rem;
-        color: #cbd5e1;
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .date-time {
-        font-size: 2rem;
-        font-weight: 700;
-        font-family: var(--font-mono);
-    }
-
-    .stat-card {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-    }
-
-    .stat-icon {
-        font-size: 2.5rem;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--radius-lg);
-        background: var(--color-gray-100);
-    }
-
-    .stat-info .stat-label {
-        font-size: 0.8rem;
-        color: var(--color-gray-500);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .stat-info .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .quick-access-grid {
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .quick-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-md);
-    }
-
-    .quick-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: var(--spacing-lg);
-        border-radius: var(--radius-lg);
-        text-decoration: none;
-        transition: all var(--transition-fast);
-        border: 2px solid transparent;
-    }
-
-    .quick-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .quick-blue {
-        background: var(--color-primary-light);
-        color: #1e40af;
-        border-color: #bfdbfe;
-    }
-
-    .quick-green {
-        background: var(--color-success-light);
-        color: #065f46;
-        border-color: #a7f3d0;
-    }
-
-    .quick-orange {
-        background: var(--color-warning-light);
-        color: #92400e;
-        border-color: #fde68a;
-    }
-
-    .quick-purple {
-        background: #ede9fe;
-        color: #6d28d9;
-        border-color: #c4b5fd;
-    }
-
-    .quick-icon {
-        font-size: 2rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .quick-label {
-        font-weight: 600;
-        font-size: 1rem;
-    }
-
-    .quick-desc {
-        font-size: 0.8rem;
-        opacity: 0.8;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: var(--spacing-md);
-        color: var(--color-gray-900);
-    }
-
-    .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: var(--spacing-md);
-        color: var(--color-gray-800);
-    }
-
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: var(--spacing-lg);
-    }
-
-    .appointment-list, .ticket-list, .payment-list, .alert-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .appointment-item, .ticket-item, .payment-item {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-sm);
-        border-radius: var(--radius-md);
-        background: var(--color-gray-50);
-    }
-
-    .appointment-item.status-consulted { border-left: 3px solid var(--color-success); }
-    .appointment-item.status-cancelled { border-left: 3px solid var(--color-danger); }
-
-    .apt-time {
-        font-weight: 600;
-        font-family: var(--font-mono);
-        min-width: 50px;
-    }
-
-    .apt-details { flex: 1; }
-    .apt-patient { font-weight: 500; margin-bottom: var(--spacing-xs); }
-    .apt-meta { display: flex; gap: var(--spacing-xs); flex-wrap: wrap; }
-
-    .ticket-number {
-        font-weight: 700;
-        font-family: var(--font-mono);
-        min-width: 80px;
-    }
-
-    .ticket-info { flex: 1; }
-    .ticket-service { font-weight: 500; }
-    .ticket-meta { display: flex; gap: var(--spacing-xs); margin-top: var(--spacing-xs); }
-
-    .payment-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: var(--spacing-sm);
-        background: var(--color-gray-50);
-        border-radius: var(--radius-md);
-    }
-
-    .payment-patient { font-weight: 500; }
-    .payment-meta { font-size: 0.8rem; color: var(--color-gray-500); display: flex; gap: var(--spacing-sm); }
-    .payment-amount { font-weight: 700; color: var(--color-success); }
-
-    .alert-item {
-        display: flex;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-sm);
-        border-radius: var(--radius-md);
-    }
-
-    .alert-item-warning { background: var(--color-warning-light); }
-
-    .alert-text { flex: 1; }
-    .alert-time { font-size: 0.75rem; color: var(--color-gray-500); margin-top: var(--spacing-xs); }
-
-    @media (max-width: 768px) {
-        .welcome-card {
-            flex-direction: column;
-            text-align: center;
-        }
-        .welcome-date { text-align: center; }
-        .dashboard-grid { grid-template-columns: 1fr; }
-    }
-</style>
-@endpush
 @endsection

@@ -26,6 +26,8 @@
     .param-btn-danger { border-color:#fca5a5; background:#fee2e2; color:#b91c1c; }
     .param-btn-primary { background:#2563eb; color:#fff; border-color:#2563eb; }
     .param-btn-primary:hover { background:#1d4ed8; color:#fff; border-color:#1d4ed8; }
+    .param-btn-success { background:#0d9488; color:#fff; border-color:#0d9488; }
+    .param-btn-success:hover { background:#0f766e; color:#fff; border-color:#0f766e; }
     .param-form label { display:block; margin-bottom:6px; font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:.04em; }
     .param-form input,.param-form select { width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:10px 12px; font: inherit; background:#fff; }
     .param-grid-form { display:grid; gap:12px; }
@@ -41,13 +43,31 @@
     @if(session('error'))
         <div class="param-warning" style="background:#fee2e2; border-color:#fecaca; color:#991b1b;">{{ session('error') }}</div>
     @endif
+    @if(session('warning'))
+        <div class="param-warning" style="background:#fff7ed; border-color:#fdba74; color:#9a3412;">{{ session('warning') }}</div>
+    @endif
+    @if(session('import_errors'))
+        <div class="param-warning" style="background:#fee2e2; border-color:#fecaca; color:#991b1b; margin-top:8px;">
+            <strong>Erreurs d'import :</strong>
+            @foreach(session('import_errors') as $err)
+                <div>{{ $err }}</div>
+            @endforeach
+        </div>
+    @endif
 
     <section class="param-hero">
         <div>
             <h2>Gestion des actes RIS</h2>
             <p>Créer, modifier ou supprimer les actes d'imagerie disponibles dans le module RIS.</p>
         </div>
-        <a href="{{ route('ris.exams.index') }}" class="param-link">Retour aux examens</a>
+        <div class="param-actions">
+            <form method="POST" action="{{ route('ris.parametrage.procedures.import-excel') }}" enctype="multipart/form-data" id="excelImportForm" style="display:none;">
+                @csrf
+                <input type="file" name="file" id="excelFileInput" accept=".xlsx,.xls,.csv">
+            </form>
+            <button type="button" class="param-btn param-btn-success" id="excelImportButton"><i class="ti ti-file-spreadsheet"></i> Import Excel</button>
+            <a href="{{ route('ris.exams.index') }}" class="param-link">Retour aux examens</a>
+        </div>
     </section>
 
     <div class="param-grid">
@@ -68,6 +88,9 @@
                                     <div style="font-weight:800; font-size:16px;">{{ $procedure->label }}</div>
                                     <div class="param-muted" style="margin-top:4px;">
                                         Code: <span class="param-badge">{{ $procedure->code }}</span>
+                                        @if($procedure->modality_type)
+                                            &middot; Type: <span class="param-badge" style="background:#dcfce7;color:#166534;">{{ $procedure->modality_type }}</span>
+                                        @endif
                                         &middot; Prix: <strong>{{ number_format((float) $procedure->price, 2, ',', ' ') }} MAD</strong>
                                         &middot; {{ $procedure->orders()->count() }} examen(s)
                                     </div>
@@ -122,6 +145,15 @@
                             <input type="text" name="label" value="{{ old('label', $editingProcedure?->label) }}" placeholder="Panoramique dentaire" required maxlength="191">
                         </div>
                         <div>
+                            <label>Type de modalité</label>
+                            <select name="modality_type">
+                                <option value="">— Non défini —</option>
+                                @foreach($modalities as $mod)
+                                    <option value="{{ $mod->type }}" @selected(old('modality_type', $editingProcedure?->modality_type) === $mod->type)>{{ $mod->type }} — {{ $mod->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
                             <label>Prix *</label>
                             <input type="number" step="0.01" min="0" name="price" value="{{ old('price', $editingProcedure?->price) }}" placeholder="250.00" required>
                         </div>
@@ -129,7 +161,7 @@
 
                     <div class="param-actions" style="margin-top:14px;">
                         <button type="submit" class="param-btn param-btn-primary">
-                            {{ $editingProcedure ? 'Enregistrer' : 'Créer l\'acte' }}
+                            {{ $editingProcedure ? 'Enregistrer' : "Créer l'acte" }}
                         </button>
                         @if($editingProcedure)
                             <a href="{{ route('ris.parametrage.procedures.index') }}" class="param-btn">Annuler</a>
@@ -140,4 +172,15 @@
         </section>
     </div>
 </div>
+
+<script>
+    document.getElementById('excelImportButton')?.addEventListener('click', () => {
+        document.getElementById('excelFileInput')?.click();
+    });
+    document.getElementById('excelFileInput')?.addEventListener('change', (e) => {
+        if (e.target.files?.length > 0) {
+            document.getElementById('excelImportForm')?.submit();
+        }
+    });
+</script>
 @endsection

@@ -3,20 +3,30 @@
     'label' => null,
     'icon' => null,
     'value' => null,
+    'modern' => false,
 ])
 
-<div class="mb-3">
+@php
+    $wrapperClass = $modern ? 'form-group' : 'mb-3';
+    $selectClass = $modern ? 'form-control-modern' : 'form-select';
+@endphp
+
+<div class="{{ $wrapperClass }}">
     @if($label)
         <label class="form-label" for="{{ $name }}">{{ $label }}</label>
     @endif
-    <div class="input-group input-group-flat">
-        @if($icon)
+    @if($icon)
+        <div class="input-group input-group-flat">
             <span class="input-group-text">
                 <i class="ti ti-{{ $icon }}"></i>
             </span>
-        @endif
-        <select id="{{ $name }}" name="{{ $name }}" {{ $attributes->class(['form-select']) }}>
+            <select id="{{ $name }}" name="{{ $name }}" {{ $attributes->class([$selectClass]) }}>
+                {{ $slot }}
+            </select>
+        </div>
+    @else
+        <select id="{{ $name }}" name="{{ $name }}" {{ $attributes->class([$selectClass]) }}>
             {{ $slot }}
         </select>
-    </div>
+    @endif
 </div>

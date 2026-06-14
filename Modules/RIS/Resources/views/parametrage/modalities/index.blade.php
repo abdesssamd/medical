@@ -45,7 +45,7 @@
     <section class="param-hero">
         <div>
             <h2>Gestion des modalités</h2>
-            <p>Créer, modifier ou supprimer les modalités d'imagerie disponibles dans le module RIS.</p>
+            <p>Types logiques d'imagerie (DICOM). Chaque type peut avoir plusieurs équipements physiques.</p>
         </div>
         <a href="{{ route('ris.exams.index') }}" class="param-link">Retour aux examens</a>
     </section>
@@ -56,7 +56,7 @@
                 <div class="param-toolbar">
                     <div>
                         <div class="param-title">Modalités enregistrées</div>
-                        <div class="param-muted">Liste des modalités disponibles pour les demandes d'examen.</div>
+                        <div class="param-muted">Liste des types d'imagerie disponibles.</div>
                     </div>
                 </div>
 
@@ -67,11 +67,13 @@
                                 <div>
                                     <div style="font-weight:800; font-size:16px;">{{ $modality->name }}</div>
                                     <div class="param-muted" style="margin-top:4px;">
-                                        Type: <span class="param-badge">{{ $modality->type }}</span>
-                                        &middot; AE: <strong>{{ $modality->ae_title }}</strong>
-                                        &middot; IP: {{ $modality->ip_address ?? '-' }}
+                                        Code DICOM: <span class="param-badge">{{ $modality->type }}</span>
                                         &middot; {{ $modality->orders()->count() }} examen(s)
+                                        &middot; {{ $modality->equipments_count }} équipement(s)
                                     </div>
+                                    @if($modality->description)
+                                        <div class="param-muted" style="margin-top:6px;font-size:0.84rem;">{{ $modality->description }}</div>
+                                    @endif
                                 </div>
                                 <div class="param-actions">
                                     <a href="{{ route('ris.parametrage.modalities.edit', $modality) }}" class="param-btn"><i class="ti ti-edit"></i></a>
@@ -116,24 +118,20 @@
                     <div class="param-grid-form">
                         <div>
                             <label>Nom *</label>
-                            <input type="text" name="name" value="{{ old('name', $editingModality?->name) }}" placeholder="Radio intra-orale" required maxlength="191">
+                            <input type="text" name="name" value="{{ old('name', $editingModality?->name) }}" placeholder="Radiographie Numérique" required maxlength="191">
                         </div>
                         <div>
-                            <label>Type *</label>
+                            <label>Code DICOM *</label>
                             <select name="type" required>
                                 <option value="">Choisir</option>
-                                <option value="radio" @selected(old('type', $editingModality?->type) === 'radio')>Radio</option>
-                                <option value="scanner" @selected(old('type', $editingModality?->type) === 'scanner')>Scanner</option>
-                                <option value="panoramique" @selected(old('type', $editingModality?->type) === 'panoramique')>Panoramique</option>
+                                @foreach(\Modules\RIS\Models\RisModality::TYPES as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('type', $editingModality?->type) === $code)>{{ $code }} — {{ $label }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
-                            <label>AE Title *</label>
-                            <input type="text" name="ae_title" value="{{ old('ae_title', $editingModality?->ae_title) }}" placeholder="INTRAORAL_AE" required maxlength="64">
-                        </div>
-                        <div>
-                            <label>Adresse IP</label>
-                            <input type="text" name="ip_address" value="{{ old('ip_address', $editingModality?->ip_address) }}" placeholder="127.0.0.1">
+                            <label>Description</label>
+                            <input type="text" name="description" value="{{ old('description', $editingModality?->description) }}" placeholder="Capteur plan numérique" maxlength="255">
                         </div>
                     </div>
 

@@ -13,6 +13,7 @@ class RisModalityController extends Controller
     public function index(): View
     {
         $modalities = RisModality::query()
+            ->withCount('equipments')
             ->orderBy('name')
             ->get();
 
@@ -26,9 +27,8 @@ class RisModalityController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:191'],
-            'type' => ['required', 'string', 'in:radio,scanner,panoramique'],
-            'ae_title' => ['required', 'string', 'max:64', 'unique:ris_modalities,ae_title'],
-            'ip_address' => ['nullable', 'ip'],
+            'type' => ['required', 'string', 'in:' . implode(',', array_keys(RisModality::TYPES))],
+            'description' => ['nullable', 'string', 'max:255'],
         ]);
 
         RisModality::query()->create($validated);
@@ -41,6 +41,7 @@ class RisModalityController extends Controller
     public function edit(RisModality $modality): View
     {
         $modalities = RisModality::query()
+            ->withCount('equipments')
             ->orderBy('name')
             ->get();
 
@@ -54,9 +55,8 @@ class RisModalityController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:191'],
-            'type' => ['required', 'string', 'in:radio,scanner,panoramique'],
-            'ae_title' => ['required', 'string', 'max:64', 'unique:ris_modalities,ae_title,'.$modality->id],
-            'ip_address' => ['nullable', 'ip'],
+            'type' => ['required', 'string', 'in:' . implode(',', array_keys(RisModality::TYPES))],
+            'description' => ['nullable', 'string', 'max:255'],
         ]);
 
         $modality->forceFill($validated)->save();

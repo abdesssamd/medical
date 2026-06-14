@@ -16,6 +16,7 @@ class RisProcedure extends Model
         'code',
         'label',
         'price',
+        'modality_type',
     ];
 
     protected $casts = [

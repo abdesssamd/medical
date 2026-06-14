@@ -1457,7 +1457,7 @@
                                         ?? data_get($payload, 'orthanc_study_id')
                                         ?? $request->study_instance_uid;
                                     $orthancViewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', 'http://127.0.0.1:8042')), '/');
-                                    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode((string) $viewerStudyId) : null;
+                                    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/ohif/viewer?StudyInstanceUIDs='.urlencode((string) $viewerStudyId) : null;
                                     $isReady = in_array($request->workflow_status, ['received', 'completed']);
                                 @endphp
                                 <tr>
@@ -1563,7 +1563,7 @@
                                     $viewerStudyId = data_get($payload, 'study_uid')
                                         ?? data_get($payload, 'orthanc_study_id');
                                     $orthancViewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', 'http://127.0.0.1:8042')), '/');
-                                    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode((string) $viewerStudyId) : null;
+                                    $viewerUrl = $viewerStudyId ? $orthancViewerBaseUrl.'/ohif/viewer?StudyInstanceUIDs='.urlencode((string) $viewerStudyId) : null;
 
                                     $statusLabel = match($order->status) {
                                         'images_recues' => 'Images recues',

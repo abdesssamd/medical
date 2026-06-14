@@ -6,7 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="/manifest.webmanifest">
-    <title>{{ config('app.name', 'DentalCare Pro') }} - @yield('title', 'Dashboard')</title>
+    <title>{{ config('app.name', 'MediOffice') }} — @yield('title', 'Dashboard')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.14.0/dist/tabler-icons.min.css">
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
     @stack('head')
     @stack('styles')
@@ -15,8 +19,8 @@
     <div class="app-layout">
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <span class="brand-icon"><i class="ti ti-tooth"></i></span>
-                <span class="brand-text">DentalCare Pro</span>
+                <div class="brand-icon"><i class="ti ti-activity-heartbeat"></i></div>
+                <span class="brand-text">MediOffice</span>
             </div>
 
             @php
@@ -47,7 +51,7 @@
                         </a>
                         <a href="{{ route('admin.settings') }}" class="nav-item {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
                             <span class="nav-icon"><i class="ti ti-settings"></i></span>
-                            <span class="nav-label">Parametres cabinet</span>
+                            <span class="nav-label">Paramètres cabinet</span>
                         </a>
                         <a href="{{ route('admin.supervisor') }}" class="nav-item {{ request()->routeIs('admin.supervisor*') ? 'active' : '' }}">
                             <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
@@ -166,12 +170,12 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn-logout">
-                            <span><i class="ti ti-logout"></i></span> Déconnexion
+                            <i class="ti ti-logout"></i> Déconnexion
                         </button>
                     </form>
                 @else
                     <a href="{{ route('login') }}" class="btn-login">
-                        <span><i class="ti ti-lock-open"></i></span> Connexion
+                        <i class="ti ti-lock-open"></i> Connexion
                     </a>
                 @endauth
             </div>

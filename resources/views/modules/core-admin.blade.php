@@ -2,169 +2,177 @@
 
 @section('title', 'Module 1 - Noyau Administratif')
 @section('page_pretitle', 'Module 1')
-@section('page_title', 'Admin / KPI / RBAC / Multi-praticien')
+@section('page_title', 'Pilotage Global — KPI & Administration')
 
 @section('content')
-<div class="care-theme">
-    <div class="row row-cards mb-3">
-        <div class="col-sm-6 col-lg-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="metric-label">CA Total</div>
-                    <div class="metric-value">{{ number_format($kpi['ca_total'], 2, ',', ' ') }} MAD</div>
-                </div>
-            </div>
+<div style="display:grid; gap:20px;">
+    {{-- KPI Cards --}}
+    <div class="stats-grid">
+        <div class="stat-card-modern" style="background:linear-gradient(135deg, #0f766e, #0f172a); color:white; border:none;">
+            <div class="stat-label" style="color:rgba(255,255,255,0.7);">CA Total</div>
+            <div class="stat-value" style="color:white;">{{ number_format($kpi['ca_total'], 2, ',', ' ') }} MAD</div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="metric-label">Devis acceptés</div>
-                    <div class="metric-value">{{ $kpi['quotes']['acceptance_rate_percent'] }}%</div>
-                </div>
-            </div>
+        <div class="stat-card-modern" style="background:linear-gradient(135deg, #1d4ed8, #0f172a); color:white; border:none;">
+            <div class="stat-label" style="color:rgba(255,255,255,0.7);">Devis acceptés</div>
+            <div class="stat-value" style="color:white;">{{ $kpi['quotes']['acceptance_rate_percent'] }}%</div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="metric-label">Annulation/No-show</div>
-                    <div class="metric-value">{{ $kpi['appointments']['cancellation_rate_percent'] }}%</div>
-                </div>
-            </div>
+        <div class="stat-card-modern" style="background:linear-gradient(135deg, #f97316, #0f172a); color:white; border:none;">
+            <div class="stat-label" style="color:rgba(255,255,255,0.7);">Annulation/No-show</div>
+            <div class="stat-value" style="color:white;">{{ $kpi['appointments']['cancellation_rate_percent'] }}%</div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="metric-label">Période</div>
-                    <div class="metric-value metric-small">{{ $from }} → {{ $to }}</div>
-                </div>
-            </div>
+        <div class="stat-card-modern">
+            <div class="stat-icon stat-icon-blue"><i class="ti ti-calendar-time"></i></div>
+            <div class="stat-label">Période</div>
+            <div class="stat-value" style="font-size:18px;">{{ $from }} → {{ $to }}</div>
         </div>
     </div>
 
-    <div class="card section-card mb-3">
-        <div class="card-header"><h3 class="card-title">Filtres KPI</h3></div>
-        <div class="card-body">
-            <form method="GET" class="row g-2 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Du</label>
-                    <input type="date" name="from" value="{{ $from }}" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Au</label>
-                    <input type="date" name="to" value="{{ $to }}" class="form-control">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary w-100">Actualiser</button>
-                </div>
-            </form>
+    {{-- Filters --}}
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h3><i class="ti ti-filter" style="margin-right:8px;"></i>Filtres KPI</h3>
         </div>
+        <form method="GET" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="form-group" style="flex:1; min-width:160px;">
+                <label>Du</label>
+                <input type="date" name="from" value="{{ $from }}" class="form-control-modern">
+            </div>
+            <div class="form-group" style="flex:1; min-width:160px;">
+                <label>Au</label>
+                <input type="date" name="to" value="{{ $to }}" class="form-control-modern">
+            </div>
+            <div class="form-group">
+                <button class="btn-modern btn-primary-modern"><i class="ti ti-refresh"></i> Actualiser</button>
+            </div>
+        </form>
     </div>
 
-    <div class="row row-cards">
-        <div class="col-lg-6">
-            <div class="card section-card">
-                <div class="card-header"><h3 class="card-title">Affectation des rôles</h3></div>
-                <div class="card-body">
-                    <form method="POST" id="roleForm">
-                        @csrf
-                        <div class="mb-2">
-                            <label class="form-label">Utilisateur</label>
-                            <select class="form-select" id="roleUserSelect" name="user_id">
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->role }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Rôles</label>
-                            <select class="form-select" name="role_codes[]" multiple size="5">
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->code }}">{{ $role->name }} ({{ $role->code }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button class="btn btn-outline-primary">Mettre à jour</button>
-                    </form>
-                </div>
+    {{-- Two column section --}}
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        {{-- Role Assignment --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-shield" style="margin-right:8px;"></i>Affectation des rôles</h3>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card section-card">
-                <div class="card-header"><h3 class="card-title">Profil comptable praticien</h3></div>
-                <div class="card-body">
-                    <form method="POST" id="accountingForm">
-                        @csrf
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <label class="form-label">Praticien</label>
-                                <select class="form-select" id="accountingUserSelect" name="user_id">
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6"><label class="form-label">Code entité</label><input class="form-control" name="entity_code"></div>
-                            <div class="col-md-6"><label class="form-label">Préfixe facture</label><input class="form-control" name="invoice_prefix" value="FAC"></div>
-                            <div class="col-md-6"><label class="form-label">Devise</label><input class="form-control" name="currency" value="MAD"></div>
-                            <div class="col-md-6"><label class="form-label">Taxe %</label><input class="form-control" type="number" step="0.01" name="default_tax_rate" value="0"></div>
-                            <div class="col-12"><button class="btn btn-outline-success">Enregistrer</button></div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card section-card mt-3">
-        <div class="card-header"><h3 class="card-title">Surcharges permissions utilisateur</h3></div>
-        <div class="card-body">
-            <form method="POST" id="permissionForm">
+            <form method="POST" id="roleForm">
                 @csrf
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <label class="form-label">Utilisateur</label>
-                        <select class="form-select" id="permissionUserSelect" name="user_id">
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
+                <div class="form-group">
+                    <label for="roleUserSelect">Utilisateur</label>
+                    <select class="form-control-modern" id="roleUserSelect" name="user_id">
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->role }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rôles</label>
+                    <select class="form-control-modern" name="role_codes[]" multiple size="4">
+                        @foreach($roles as $role)
+                            <option value="{{ $role->code }}">{{ $role->name }} ({{ $role->code }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button class="btn-modern btn-outline-modern"><i class="ti ti-device-floppy"></i> Mettre à jour</button>
+            </form>
+        </div>
+
+        {{-- Accounting Profile --}}
+        <div class="content-card">
+            <div class="card-header-custom">
+                <h3><i class="ti ti-report-money" style="margin-right:8px;"></i>Profil comptable praticien</h3>
+            </div>
+            <form method="POST" id="accountingForm">
+                @csrf
+                <div class="form-group">
+                    <label>Praticien</label>
+                    <select class="form-control-modern" id="accountingUserSelect" name="user_id">
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label>Code entité</label>
+                        <input class="form-control-modern" name="entity_code">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Permission</label>
-                        <select class="form-select" name="permissions[0][code]">
-                            @foreach($permissions as $permission)
-                                <option value="{{ $permission->code }}">{{ $permission->name }} ({{ $permission->code }})</option>
-                            @endforeach
-                        </select>
+                    <div class="form-group">
+                        <label>Préfixe facture</label>
+                        <input class="form-control-modern" name="invoice_prefix" value="FAC">
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">État</label>
-                        <select class="form-select" name="permissions[0][is_granted]">
-                            <option value="1">Accorder</option>
-                            <option value="0">Refuser</option>
-                        </select>
+                    <div class="form-group">
+                        <label>Devise</label>
+                        <input class="form-control-modern" name="currency" value="MAD">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-outline-dark w-100">Appliquer</button>
+                    <div class="form-group">
+                        <label>Taxe %</label>
+                        <input class="form-control-modern" type="number" step="0.01" name="default_tax_rate" value="0">
                     </div>
                 </div>
+                <button class="btn-modern btn-success-modern"><i class="ti ti-device-floppy"></i> Enregistrer</button>
             </form>
         </div>
     </div>
 
-    <div class="card section-card mt-3">
-        <div class="card-header"><h3 class="card-title">CA par spécialité</h3></div>
-        <div class="table-responsive">
-            <table class="table table-vcenter">
-                <thead><tr><th>Spécialité</th><th class="text-end">CA</th></tr></thead>
+    {{-- Permission Overrides --}}
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h3><i class="ti ti-lock" style="margin-right:8px;"></i>Surcharges permissions utilisateur</h3>
+        </div>
+        <form method="POST" id="permissionForm">
+            @csrf
+            <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+                <div class="form-group" style="flex:1; min-width:180px;">
+                    <label>Utilisateur</label>
+                    <select class="form-control-modern" id="permissionUserSelect" name="user_id">
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group" style="flex:2; min-width:200px;">
+                    <label>Permission</label>
+                    <select class="form-control-modern" name="permissions[0][code]">
+                        @foreach($permissions as $permission)
+                            <option value="{{ $permission->code }}">{{ $permission->name }} ({{ $permission->code }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1; min-width:120px;">
+                    <label>État</label>
+                    <select class="form-control-modern" name="permissions[0][is_granted]">
+                        <option value="1">Accorder</option>
+                        <option value="0">Refuser</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn-modern btn-primary-modern"><i class="ti ti-checks"></i> Appliquer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- CA by Specialty --}}
+    <div class="content-card">
+        <div class="card-header-custom">
+            <h3><i class="ti ti-chart-bar" style="margin-right:8px;"></i>CA par spécialité</h3>
+        </div>
+        <div class="table-wrap">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Spécialité</th>
+                        <th style="text-align:right;">CA</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @forelse($kpi['ca_by_specialty'] as $row)
                         <tr>
-                            <td>{{ $row->specialty_name }}</td>
-                            <td class="text-end">{{ number_format((float)$row->total, 2, ',', ' ') }} MAD</td>
+                            <td><span class="badge-modern badge-blue">{{ $row->specialty_name }}</span></td>
+                            <td style="text-align:right; font-weight:700;">{{ number_format((float)$row->total, 2, ',', ' ') }} MAD</td>
                         </tr>
                     @empty
-                        <tr><td colspan="2" class="text-secondary">Aucune donnée.</td></tr>
+                        <tr><td colspan="2" style="text-align:center; color:#94a3b8; padding:40px;">Aucune donnée.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -172,17 +180,6 @@
     </div>
 </div>
 @endsection
-
-@push('head')
-<style>
-.care-theme { --tone-a:#0f766e; --tone-b:#0f172a; --tone-c:#fb923c; }
-.metric-card { background: linear-gradient(135deg, color-mix(in srgb, var(--tone-a) 90%, white), var(--tone-b)); color: #fff; border: 0; }
-.metric-label { opacity: .9; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; }
-.metric-value { font-size: 1.6rem; font-weight: 700; line-height: 1.2; margin-top: 4px; }
-.metric-small { font-size: 1.05rem; }
-.section-card { border: 1px solid #dbe2ea; box-shadow: 0 8px 18px rgba(15,23,42,.06); }
-</style>
-@endpush
 
 @push('scripts')
 <script>
@@ -201,4 +198,3 @@
 })();
 </script>
 @endpush
-

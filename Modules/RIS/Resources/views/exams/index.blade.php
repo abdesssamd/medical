@@ -24,8 +24,9 @@
 
         .ris26-top {
             display: grid;
-            grid-template-columns: 1.4fr 0.9fr;
+            grid-template-columns: 1.5fr 1fr;
             gap: 12px;
+            align-items: stretch;
         }
 
         .ris26-card {
@@ -45,30 +46,50 @@
         }
 
         .ris26-hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 0;
+            height: 100%;
+            max-height: 180px;
+            padding: 18px 22px;
             background:
                 radial-gradient(circle at top right, rgba(13, 148, 136, 0.16), transparent 30%),
                 linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.92));
         }
 
+        .ris26-hero .ris26-panel {
+            padding: 0;
+        }
+
         .ris26-eyebrow {
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 0.16em;
             text-transform: uppercase;
             color: var(--ris-accent-deep);
             font-weight: 800;
+            margin-bottom: 2px;
         }
 
         .ris26-title {
-            margin: 4px 0 6px;
-            font-size: clamp(2rem, 4vw, 3.25rem);
-            line-height: 0.95;
-            letter-spacing: -0.03em;
+            margin: 0 0 2px;
+            font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .ris26-copy {
             max-width: 58ch;
             color: var(--ris-muted);
-            font-size: 0.98rem;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
         }
 
         .ris26-inline-meta,
@@ -76,21 +97,21 @@
         .ris26-toolbar {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .ris26-inline-meta {
-            margin-top: 16px;
+            margin-top: 0;
         }
 
         .ris26-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             border-radius: 999px;
-            padding: 9px 12px;
-            font-size: 0.78rem;
+            padding: 5px 10px;
+            font-size: 0.72rem;
             font-weight: 700;
             background: #fff;
             border: 1px solid var(--ris-line);
@@ -100,73 +121,100 @@
         .ris26-pill.is-ok { color: #0f766e; background: rgba(13, 148, 136, 0.10); border-color: rgba(13, 148, 136, 0.20); }
         .ris26-pill.is-bad { color: #b91c1c; background: #fff1f2; border-color: #fecdd3; }
 
-        .ris26-side-stack { display: grid; gap: 14px; }
-
-        .ris26-small-title {
-            font-size: 0.76rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--ris-muted);
-            font-weight: 800;
+        .ris26-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            height: 100%;
         }
 
-        .ris26-status-title {
-            margin: 8px 0 2px;
-            font-size: 1.15rem;
-            font-weight: 800;
-        }
-
-        .ris26-status-copy {
-            color: var(--ris-muted);
-            font-size: 0.9rem;
-        }
-
-        .ris26-spotlight-trigger {
-            width: 100%;
+        .ris26-action-card {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
             border: 1px solid var(--ris-line);
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 16px 18px;
+            border-radius: 16px;
+            background: #fff;
+            padding: 14px 16px;
             cursor: pointer;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            min-height: 0;
         }
 
-        .ris26-spotlight-trigger-main {
+        .ris26-action-card:hover {
+            border-color: var(--ris-accent);
+            box-shadow: 0 2px 12px rgba(13, 148, 136, 0.08);
+        }
+
+        .ris26-action-card-top {
             display: flex;
             align-items: center;
-            gap: 14px;
-            min-width: 0;
+            gap: 10px;
         }
 
-        .ris26-spotlight-icon,
-        .ris26-kpi-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 16px;
+        .ris26-action-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
             display: grid;
             place-items: center;
             background: var(--ris-accent-soft);
             color: var(--ris-accent-deep);
             flex: 0 0 auto;
+            font-size: 1.05rem;
         }
 
-        .ris26-spotlight-copy strong { display: block; font-size: 1rem; }
-        .ris26-spotlight-copy span { color: var(--ris-muted); font-size: 0.88rem; }
+        .ris26-action-label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            line-height: 1.15;
+        }
 
-        .ris26-kbd {
+        .ris26-action-desc {
+            color: var(--ris-muted);
+            font-size: 0.72rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ris26-action-badge {
+            align-self: flex-start;
             border: 1px solid #d7e5ef;
             background: #fff;
             border-radius: 999px;
-            padding: 8px 10px;
+            padding: 3px 8px;
             color: var(--ris-muted);
-            font-size: 0.76rem;
+            font-size: 0.65rem;
             font-weight: 800;
             white-space: nowrap;
+            margin-left: auto;
         }
+
+        .ris26-pacs-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--ris-muted);
+            margin-top: 2px;
+        }
+
+        .ris26-pacs-indicator .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .ris26-pacs-indicator .dot.ok { background: #22c55e; }
+        .ris26-pacs-indicator .dot.bad { background: #ef4444; }
 
         .ris26-selected {
             display: flex;
@@ -456,6 +504,57 @@
             border-color: rgba(13, 148, 136, 0.18);
         }
 
+        .ris26-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid #d7e5ef;
+            border-radius: 10px;
+            background: #fff;
+            color: #475569;
+            text-decoration: none;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+            font-size: 1.05rem;
+        }
+        .ris26-action-btn:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        .ris26-action-btn-viewer {
+            background: rgba(13, 148, 136, 0.08);
+            color: var(--ris-accent-deep);
+            border-color: rgba(13, 148, 136, 0.18);
+        }
+        .ris26-action-btn-viewer:hover {
+            background: var(--ris-accent);
+            border-color: var(--ris-accent);
+            color: #fff;
+        }
+        .ris26-action-btn-mwl {
+            color: #7c3aed;
+            border-color: #ddd6fe;
+            background: #f5f3ff;
+        }
+        .ris26-action-btn-mwl:hover {
+            background: #7c3aed;
+            border-color: #7c3aed;
+            color: #fff;
+        }
+        .ris26-action-btn-import {
+            color: #0d9488;
+            border-color: #99f6e4;
+            background: #f0fdfa;
+        }
+        .ris26-action-btn-import:hover {
+            background: #0d9488;
+            border-color: #0d9488;
+            color: #fff;
+        }
+
         .ris26-reports {
             display: grid;
             gap: 12px;
@@ -708,7 +807,19 @@
         }
 
         @media (max-width: 1200px) {
-            .ris26-top,
+            .ris26-top {
+                grid-template-columns: 1fr;
+            }
+
+            .ris26-hero {
+                max-height: none;
+                padding: 16px 18px;
+            }
+
+            .ris26-actions-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
             .ris26-grid {
                 grid-template-columns: 1fr;
             }
@@ -723,6 +834,10 @@
         }
 
         @media (max-width: 768px) {
+            .ris26-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .ris26-kpis,
             .ris26-filters,
             .ris26-form-grid,
@@ -772,57 +887,82 @@
                 <div class="ris26-panel">
                     <div class="ris26-eyebrow">Radiologie dentaire</div>
                     <h1 class="ris26-title">RIS edge-to-edge, plus calme, plus rapide.</h1>
-                    <p class="ris26-copy">Demandes, PACS , réception d’images et comptes rendus dans un flux unique plus lisible, avec recherche globale et suivi live des statuts.</p>
+                    <p class="ris26-copy">Demandes, PACS, réception d'images et comptes rendus en un flux unique.</p>
 
                     <div class="ris26-inline-meta">
                         <span class="ris26-pill {{ ($orthancStatus['ok'] ?? false) ? 'is-ok' : 'is-bad' }}">
                             <i class="ti ti-activity-heartbeat"></i>
                             {{ ($orthancStatus['ok'] ?? false) ? 'PACS connecte' : 'PACS indisponible' }}
                         </span>
-                        <span class="ris26-pill">{{ $patients->count() }} patients visibles</span>
+                        <span class="ris26-pill">{{ $patients->count() }} patients</span>
                         <span class="ris26-pill">{{ $modalities->count() }} modalites | {{ $procedures->count() }} actes</span>
                     </div>
                 </div>
             </article>
 
-            <div class="ris26-side-stack">
-                <article class="ris26-card">
-                    <div class="ris26-panel">
-                        <div class="ris26-small-title">Etat de la connexion</div>
-                        <div class="ris26-status-title">{{ ($orthancStatus['ok'] ?? false) ? 'PACS pret' : 'Connexion a verifier' }}</div>
-                        <div class="ris26-status-copy">
-                            @if($orthancStatus['ok'] ?? false)
-                                HTTP {{ $orthancStatus['status'] ?? 200 }} | {{ data_get($orthancStatus, 'data.Name', 'Orthanc') }}
-                            @else
-                                {{ $orthancStatus['message'] ?? 'Verifier la configuration RIS_ORTHANC_*' }}
-                            @endif
-                        </div>
+            <div class="ris26-actions-grid">
+                <div class="ris26-action-card" title="{{ ($orthancStatus['ok'] ?? false) ? data_get($orthancStatus, 'data.Name', 'Orthanc') : 'Connexion a verifier' }}">
+                    <div class="ris26-action-card-top">
+                        <span class="ris26-action-icon"><i class="ti ti-activity-heartbeat"></i></span>
+                        <span class="ris26-action-label">PACS</span>
+                        <span class="ris26-action-badge">{{ ($orthancStatus['ok'] ?? false) ? 'OK' : 'ERR' }}</span>
                     </div>
-                </article>
+                    <div class="ris26-action-desc">
+                        @if($orthancStatus['ok'] ?? false)
+                            {{ data_get($orthancStatus, 'data.Name', 'Orthanc') }} · HTTP {{ $orthancStatus['status'] ?? 200 }}
+                        @else
+                            {{ $orthancStatus['message'] ?? 'Verifier la configuration' }}
+                        @endif
+                    </div>
+                    <div class="ris26-pacs-indicator">
+                        <span class="dot {{ ($orthancStatus['ok'] ?? false) ? 'ok' : 'bad' }}"></span>
+                        {{ ($orthancStatus['ok'] ?? false) ? 'Connecte' : 'Indisponible' }}
+                    </div>
+                </div>
 
-                <a href="{{ route('patient-portal.admin.index') }}" class="ris26-spotlight-trigger" style="text-decoration:none;">
-                    <span class="ris26-spotlight-trigger-main">
-                        <span class="ris26-spotlight-icon"><i class="ti ti-door-enter"></i></span>
-                        <span class="ris26-spotlight-copy">
-                            <strong>Portail patient</strong>
-                            <span>Accéder à la gestion des accès patient, codes et mémo.</span>
-                        </span>
-                    </span>
-                    <span class="ris26-kbd">Admin</span>
+                <a href="{{ route('patient-portal.admin.index') }}" class="ris26-action-card" style="text-decoration:none;">
+                    <div class="ris26-action-card-top">
+                        <span class="ris26-action-icon"><i class="ti ti-door-enter"></i></span>
+                        <span class="ris26-action-label">Portail patient</span>
+                        <span class="ris26-action-badge">Admin</span>
+                    </div>
+                    <div class="ris26-action-desc">Accéder à la gestion des accès patient, codes et mémo.</div>
                 </a>
 
-                <button type="button" class="ris26-spotlight-trigger" id="ris26SpotlightTrigger">
-                    <span class="ris26-spotlight-trigger-main">
-                        <span class="ris26-spotlight-icon"><i class="ti ti-search"></i></span>
-                        <span class="ris26-spotlight-copy">
-                            <strong>Recherche centrale RIS</strong>
-                            <span>Patients, examens récents et actions rapides dans un spotlight unique.</span>
-                        </span>
-                    </span>
-                    <span class="ris26-kbd">Ctrl K</span>
+                <button type="button" class="ris26-action-card" id="ris26SpotlightTrigger">
+                    <div class="ris26-action-card-top">
+                        <span class="ris26-action-icon"><i class="ti ti-search"></i></span>
+                        <span class="ris26-action-label">Recherche RIS</span>
+                        <span class="ris26-action-badge">Ctrl K</span>
+                    </div>
+                    <div class="ris26-action-desc">Patients, examens et actions rapides dans un spotlight unique.</div>
+                </button>
+
+                <form id="risDicomUploadForm" method="POST" action="{{ route('ris.exams.upload-dicom') }}" enctype="multipart/form-data" style="display:none;">
+                    @csrf
+                    <input type="file" name="dicoms[]" id="risDicomFileInput" multiple accept=".dcm,.dicom" webkitdirectory>
+                </form>
+                <button type="button" class="ris26-action-card" id="risDicomUploadButton">
+                    <div class="ris26-action-card-top">
+                        <span class="ris26-action-icon"><i class="ti ti-upload"></i></span>
+                        <span class="ris26-action-label">Importer DICOM</span>
+                        <span class="ris26-action-badge">Fichier</span>
+                    </div>
+                    <div class="ris26-action-desc">Charger un fichier ou dossier DICOM vers Orthanc.</div>
                 </button>
             </div>
         </section>
+
+        <script>
+            document.getElementById('risDicomUploadButton')?.addEventListener('click', () => {
+                document.getElementById('risDicomFileInput')?.click();
+            });
+            document.getElementById('risDicomFileInput')?.addEventListener('change', (e) => {
+                if (e.target.files?.length > 0) {
+                    document.getElementById('risDicomUploadForm')?.submit();
+                }
+            });
+        </script>
 
         @if($selectedPatient)
             <section class="ris26-selected">
@@ -993,21 +1133,21 @@
                                         </td>
                                         <td>
                                             <div class="ris26-row-actions">
-                                                <a href="{{ route('ris.exams.show', $order) }}" class="ris26-btn ris26-btn-soft">Ouvrir</a>
+                                                <a href="{{ route('ris.exams.show', $order) }}" class="ris26-action-btn" title="Ouvrir la fiche examen"><i class="ti ti-file-text"></i></a>
                                                 @if($viewerUrl)
-                                                    <a href="{{ $viewerUrl }}" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
+                                                    <a href="{{ $viewerUrl }}" target="_blank" rel="noopener" class="ris26-action-btn ris26-action-btn-viewer" title="Visualiser les images"><i class="ti ti-eye"></i></a>
                                                 @endif
                                                 @if($order->status === \Modules\RIS\Models\RisOrder::STATUS_ORDONNE)
-                                                    <form method="POST" action="{{ route('ris.exams.waiting', $order) }}">
+                                                    <form method="POST" action="{{ route('ris.exams.waiting', $order) }}" style="display:inline;">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="ris26-btn">Attente</button>
+                                                        <button type="submit" class="ris26-action-btn" title="Passer en attente"><i class="ti ti-clock"></i></button>
                                                     </form>
                                                 @endif
                                                 @if($order->status !== \Modules\RIS\Models\RisOrder::STATUS_TERMINE && $order->status !== \Modules\RIS\Models\RisOrder::STATUS_ANNULE)
-                                                    <form method="POST" action="{{ route('ris.exams.worklist', $order) }}">
+                                                    <form method="POST" action="{{ route('ris.exams.worklist', $order) }}" style="display:inline;">
                                                         @csrf
-                                                        <button type="submit" class="ris26-btn">MWL</button>
+                                                        <button type="submit" class="ris26-action-btn ris26-action-btn-mwl" title="Envoyer à la worklist"><i class="ti ti-server"></i></button>
                                                     </form>
                                                 @endif
                                             </div>
@@ -1068,7 +1208,7 @@
                                             <td>
                                                 <div class="ris26-row-actions">
                                                     @if($studyViewerUrl)
-                                                        <a href="{{ $studyViewerUrl }}" target="_blank" rel="noopener" class="ris26-btn ris26-btn-primary">Viewer</a>
+                                                        <a href="{{ $studyViewerUrl }}" target="_blank" rel="noopener" class="ris26-action-btn ris26-action-btn-viewer" title="Visualiser les images"><i class="ti ti-eye"></i></a>
                                                     @endif
                                                     <form method="POST" action="{{ route('ris.exams.import-orphan') }}" style="display:inline;">
                                                         @csrf
@@ -1080,9 +1220,7 @@
                                                         <input type="hidden" name="study_description" value="{{ $study->study_description }}">
                                                         <input type="hidden" name="modality" value="{{ $study->modality }}">
                                                         <input type="hidden" name="study_date" value="{{ $study->study_date }}">
-                                                        <button type="submit" class="ris26-btn" style="background:#0d9488;color:#fff;border-color:#0d9488;" onclick="return confirm('Importer cette étude PACS dans le RIS ? Un nouvel examen urgent sera créé.');">
-                                                            <i class="ti ti-plus"></i> Importer
-                                                        </button>
+                                                        <button type="submit" class="ris26-action-btn ris26-action-btn-import" title="Importer dans le RIS" onclick="return confirm('Importer cette étude PACS dans le RIS ? Un nouvel examen urgent sera créé.');"><i class="ti ti-plus"></i></button>
                                                     </form>
                                                 </div>
                                             </td>
@@ -1243,22 +1381,31 @@
 
                     <div class="ris26-field">
                         <label>Acte RIS</label>
-                        <select name="procedure_id" required>
+                        <select name="procedure_id" id="risProcedureSelect" required>
                             <option value="">Choisir</option>
                             @foreach($procedures as $procedure)
-                                <option value="{{ $procedure->id }}" @selected((int) old('procedure_id') === (int) $procedure->id)>{{ $procedure->label }} | {{ number_format((float) $procedure->price, 2, ',', ' ') }} MAD</option>
+                                <option value="{{ $procedure->id }}" data-modality-type="{{ $procedure->modality_type }}" @selected((int) old('procedure_id') === (int) $procedure->id)>{{ $procedure->label }} | {{ number_format((float) $procedure->price, 2, ',', ' ') }} MAD</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="ris26-field">
-                        <label>Modalite</label>
-                        <select name="modality_id" required>
+                        <label>Équipement / Machine</label>
+                        <select name="equipment_id" id="risModalitySelect" required>
                             <option value="">Choisir</option>
-                            @foreach($modalities as $modality)
-                                <option value="{{ $modality->id }}" @selected((int) old('modality_id') === (int) $modality->id)>{{ $modality->name }} | {{ strtoupper($modality->ae_title) }}</option>
+                            @foreach($equipments as $equipment)
+                                <option value="{{ $equipment->id }}" data-modality-type="{{ $equipment->modality?->type }}" data-modality-name="{{ $equipment->name }}">
+                                    {{ $equipment->name }}
+                                    @if($equipment->modality)
+                                        ({{ $equipment->modality->type }} — {{ $equipment->modality->name }})
+                                    @endif
+                                    @if($equipment->location)
+                                        [{{ $equipment->location }}]
+                                    @endif
+                                </option>
                             @endforeach
                         </select>
+                        <div style="margin-top:6px;font-size:0.78rem;color:#64748b;" id="risModalityHint"></div>
                     </div>
 
                     <div class="ris26-field">
@@ -1310,6 +1457,49 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            const procedureSelect = document.getElementById('risProcedureSelect');
+            const modalitySelect = document.getElementById('risModalitySelect');
+            const modalityHint = document.getElementById('risModalityHint');
+
+            if (procedureSelect && modalitySelect) {
+                const filterModalities = () => {
+                    const selectedOption = procedureSelect.options[procedureSelect.selectedIndex];
+                    const modalityType = selectedOption?.dataset?.modalityType || '';
+                    let visibleCount = 0;
+                    let firstVisible = null;
+
+                    for (const opt of modalitySelect.options) {
+                        if (!opt.value) continue;
+                        const matches = !modalityType || opt.dataset.modalityType === modalityType;
+                        opt.style.display = matches ? '' : 'none';
+                        if (matches) {
+                            visibleCount++;
+                            if (!firstVisible) firstVisible = opt;
+                        }
+                    }
+
+                    if (modalityType) {
+                        if (visibleCount === 0) {
+                            modalityHint.textContent = 'Aucun équipement disponible pour cet acte.';
+                        } else if (visibleCount === 1 && firstVisible) {
+                            firstVisible.selected = true;
+                            modalityHint.textContent = 'Équipement sélectionné automatiquement : ' + (firstVisible.dataset.modalityName || '');
+                        } else {
+                            if (!modalitySelect.value || modalitySelect.options[modalitySelect.selectedIndex]?.style.display === 'none') {
+                                modalitySelect.value = '';
+                            }
+                            modalityHint.textContent = visibleCount + ' équipement(s) disponible(s) pour cet acte.';
+                        }
+                    } else {
+                        modalityHint.textContent = '';
+                    }
+                };
+
+                procedureSelect.addEventListener('change', filterModalities);
+                filterModalities();
+            }
+
             const spotlightOverlay = document.getElementById('ris26SpotlightOverlay');
             const spotlightTrigger = document.getElementById('ris26SpotlightTrigger');
             const spotlightInput = document.getElementById('ris26SpotlightInput');

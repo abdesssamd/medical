@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Modules\RIS\Models\RisEquipment;
 use Modules\RIS\Models\RisModality;
 use Modules\RIS\Models\RisOrder;
 use Modules\RIS\Models\RisProcedure;
@@ -192,6 +193,11 @@ class RisExamController extends Controller
             'priorityLabels' => RisOrder::priorityLabels(),
             'orphanStudies' => $orphanStudies,
             'orphanStudiesError' => $orphanStudiesError,
+            'equipments' => \Modules\RIS\Models\RisEquipment::query()
+                ->with('modality')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -433,7 +439,7 @@ class RisExamController extends Controller
         $validated = $request->validate([
             'patient_id' => ['required', 'integer', 'exists:patients,id'],
             'procedure_id' => ['required', 'integer', 'exists:ris_procedures,id'],
-            'modality_id' => ['required', 'integer', 'exists:ris_modalities,id'],
+            'equipment_id' => ['required', 'integer', 'exists:ris_equipments,id'],
             'priority' => ['required', 'string', 'in:routine,urgent,stat'],
             'clinical_indication' => ['nullable', 'string', 'max:4000'],
             'requested_by_user_id' => ['nullable', 'integer', 'exists:users,id'],
@@ -442,11 +448,14 @@ class RisExamController extends Controller
             'sync_to_orthanc' => ['nullable', 'boolean'],
         ]);
 
-        $order = DB::transaction(function () use ($validated): RisOrder {
+        $equipment = RisEquipment::findOrFail($validated['equipment_id']);
+
+        $order = DB::transaction(function () use ($validated, $equipment): RisOrder {
             return RisOrder::query()->create([
                 'patient_id' => $validated['patient_id'],
                 'procedure_id' => $validated['procedure_id'],
-                'modality_id' => $validated['modality_id'],
+                'modality_id' => $equipment->modality_id,
+                'equipment_id' => $validated['equipment_id'],
                 'accession_number' => $this->generateAccessionNumber(),
                 'priority' => $validated['priority'],
                 'clinical_indication' => $validated['clinical_indication'] ?? null,
@@ -590,6 +599,30 @@ class RisExamController extends Controller
         return redirect()
             ->route('ris.exams.show', $order)
             ->with('success', 'Étude PACS importée avec succès (urgent, images déjà reçues).');
+    }
+
+    /**
+     * Upload un ou plusieurs fichiers DICOM vers Orthanc.
+     */
+    public function uploadDicom(Request $request, OrthancService $orthancService): RedirectResponse
+    {
+        $request->validate([
+            'dicoms' => ['required', 'array', 'min:1'],
+            'dicoms.*' => ['required', 'file', 'max:204800'],
+        ]);
+
+        $filePaths = [];
+        foreach ($request->file('dicoms') as $file) {
+            $filePaths[] = $file->getPathname();
+        }
+
+        $result = $orthancService->uploadDicomFiles($filePaths);
+
+        if (! $result['ok']) {
+            return back()->with('error', 'Aucun fichier DICOM importé. Vérifiez le format des fichiers.');
+        }
+
+        return back()->with('success', "{$result['success']}/{$result['total']} fichier(s) DICOM importé(s) avec succès vers Orthanc.");
     }
 
     public function syncSelectedPatientWithOrthanc(Request $request, OrthancService $orthancService): RedirectResponse
@@ -798,7 +831,7 @@ class RisExamController extends Controller
             ?? data_get($payload, 'orthanc_study_id')
             ?? data_get($payload, 'reconciliation.matched_study.study_id');
         $viewerBaseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/');
-        $viewerUrl = $studyId ? $viewerBaseUrl.'/stone-webviewer/index.html?study='.urlencode((string) $studyId) : null;
+        $viewerUrl = $studyId ? $viewerBaseUrl.'/ohif/viewer?StudyInstanceUIDs='.urlencode((string) $studyId) : null;
 
         return view('ris::reports.shared', [
             'report' => $report,
@@ -846,7 +879,7 @@ class RisExamController extends Controller
 
     private function dispatchWorklist(RisOrder $order, OrthancService $orthancService): array
     {
-        $order->loadMissing(['patient', 'procedure', 'modality', 'requestedBy']);
+        $order->loadMissing(['patient', 'procedure', 'modality', 'equipment', 'requestedBy']);
 
         $result = $orthancService->createModalityWorklistForOrder($order);
         $payload = (array) ($order->orthanc_payload ?? []);

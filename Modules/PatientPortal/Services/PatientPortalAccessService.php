@@ -220,7 +220,7 @@ class PatientPortalAccessService
 
         $baseUrl = rtrim((string) config('ris.orthanc.viewer_base_url', config('ris.orthanc.base_url', config('services.orthanc.base_url', 'http://127.0.0.1:8042'))), '/');
 
-        return $baseUrl.'/stone-webviewer/index.html?study='.urlencode((string) $studyId);
+        return $baseUrl.'/ohif/viewer?StudyInstanceUIDs='.urlencode((string) $studyId);
     }
 
     private function resolveDeliveryChannel(?Patient $patient): string

@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureRisIsEnabled;
 use Illuminate\Support\Facades\Route;
 use Modules\RIS\Http\Controllers\RisAiController;
 use Modules\RIS\Http\Controllers\RisExamController;
+use Modules\RIS\Http\Controllers\RisEquipmentController;
 use Modules\RIS\Http\Controllers\RisModalityController;
 use Modules\RIS\Http\Controllers\RisProcedureController;
 use Modules\RIS\Http\Controllers\RisReportTemplateController;
@@ -36,6 +37,7 @@ Route::middleware(['web', 'auth', EnsureRisIsEnabled::class])
         Route::post('/examens/{order}/worklist', [RisExamController::class, 'syncWorklist'])->name('exams.worklist');
         Route::post('/examens/synchroniser-pacs', [RisExamController::class, 'syncSelectedPatientWithOrthanc'])->name('exams.sync-pacs');
         Route::post('/examens/importer-orphan', [RisExamController::class, 'importOrphanStudy'])->name('exams.import-orphan');
+        Route::post('/examens/upload-dicom', [RisExamController::class, 'uploadDicom'])->name('exams.upload-dicom');
 
         Route::get('/templates', [RisReportTemplateController::class, 'index'])->name('templates.index');
         Route::post('/templates', [RisReportTemplateController::class, 'store'])->name('templates.store');
@@ -55,6 +57,14 @@ Route::middleware(['web', 'auth', EnsureRisIsEnabled::class])
             Route::get('/modalities/{modality}/edit', [RisModalityController::class, 'edit'])->name('modalities.edit');
             Route::put('/modalities/{modality}', [RisModalityController::class, 'update'])->name('modalities.update');
             Route::delete('/modalities/{modality}', [RisModalityController::class, 'destroy'])->name('modalities.destroy');
+
+            Route::get('/equipments', [RisEquipmentController::class, 'index'])->name('equipments.index');
+            Route::post('/equipments', [RisEquipmentController::class, 'store'])->name('equipments.store');
+            Route::get('/equipments/{equipment}/edit', [RisEquipmentController::class, 'edit'])->name('equipments.edit');
+            Route::put('/equipments/{equipment}', [RisEquipmentController::class, 'update'])->name('equipments.update');
+            Route::delete('/equipments/{equipment}', [RisEquipmentController::class, 'destroy'])->name('equipments.destroy');
+
+            Route::post('/procedures/import-excel', [RisProcedureController::class, 'importExcel'])->name('procedures.import-excel');
         });
     });
 

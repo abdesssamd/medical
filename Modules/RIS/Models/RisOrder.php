@@ -28,6 +28,7 @@ class RisOrder extends Model
         'patient_id',
         'procedure_id',
         'modality_id',
+        'equipment_id',
         'accession_number',
         'priority',
         'clinical_indication',
@@ -66,6 +67,11 @@ class RisOrder extends Model
     public function modality(): BelongsTo
     {
         return $this->belongsTo(RisModality::class, 'modality_id');
+    }
+
+    public function equipment(): BelongsTo
+    {
+        return $this->belongsTo(RisEquipment::class, 'equipment_id');
     }
 
     public function report(): HasOne
